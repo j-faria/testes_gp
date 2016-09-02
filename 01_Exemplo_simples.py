@@ -5,6 +5,7 @@ Created on Thu Sep  1 11:23:01 2016
 @author: camacho
 """
 
+#Exemplo da pagina do george
 ########## GERAR DADOS INICIAIS ALEATORIOS ##########
 import numpy as np
 import matplotlib.pyplot as pl
