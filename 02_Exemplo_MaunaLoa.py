@@ -5,6 +5,7 @@ Created on Fri Sep  2 10:01:18 2016
 @author: camacho
 """
 
+#Exemplo da pagina do george
 ########## IMPORTAR DADOS INICIAIS ALEATORIOS ##########
 import numpy as np
 import statsmodels.api as sm
