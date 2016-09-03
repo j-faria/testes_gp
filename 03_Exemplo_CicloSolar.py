@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Sep  2 13:14:28 2016
-
-@author: camacho
-"""
+### TRABALHO EM CURSO ###
 
 ########## IMPORTAR DADOS INICIAIS ##########
 import numpy as np
