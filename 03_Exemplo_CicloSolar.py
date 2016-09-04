@@ -16,9 +16,10 @@ t=data[2965:3120,2] #ciclo 23
 y=data[2965:3120,3]
 #t=data[2965:-1,2] #ciclo 23 + ciclo 24
 #y=data[2965:-1,3]
+yerr = 0.2*np.ones_like(t)
 
 pl.figure()
-pl.plot(t,y,'*')
+pl.plot(t,y,'.')
 pl.grid()
 pl.show()
 
@@ -31,33 +32,36 @@ k2 = (100**2)*kernels.ExpSine2Kernel((2.0/0.01)**2,11)
 
 k3 = kernels.WhiteKernel(0.2)    
 
-kernel = k2 #+ k3
+kernel = k2 + k3
 
     #optimization  - find the “best-fit” hyperparameters
 #gp = GP(kernel, mean=np.mean(y))
 gp = GP(kernel, solver=HODLRSolver)
-gp.compute(t)
+gp.compute(t,yerr)
 print(gp.lnlikelihood(y))
 print(gp.grad_lnlikelihood(y))
 
 
     #Compute the predicted values of the function at a fine grid of points 
 #conditioned on the observed data
+x=t
 #x = np.linspace(1996.124, 2008.958, 155) #ciclo 23
-x = np.linspace(min(t), max(t), len(t))
-
+#x = np.linspace(min(t), max(t), len(t))
+#x = np.linspace(1996.5, 2009, len(t))
 #x = np.linspace(max(t),2025,(2025-max(t))*12) #previsao ?
-mu, cov = gp.predict(y, t) #mean mu and covariance cov
+mu, cov = gp.predict(y, x) #mean mu and covariance cov
 std = np.sqrt(np.diag(cov))
 
     #Graficos todos xpto
-pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
-pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
-pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
-pl.plot(t, mu, color="k", alpha=1, lw=0.5)
-#pl.errorbar(t, y, yerr=yerr, fmt=".k", capsize=0)
+pl.fill_between(x, mu+std, mu-std, color="k", alpha=0.1)
+pl.plot(x, mu+std, color="k", alpha=1, lw=0.25)
+pl.plot(x, mu-std, color="k", alpha=1, lw=0.25)
+pl.plot(x, mu, color="r", alpha=1, lw=0.9)
+pl.errorbar(x, y, yerr=yerr, fmt=".k", capsize=0)
 pl.xlabel("$x$")
 pl.ylabel("$y$")
+
+
 
 
 
