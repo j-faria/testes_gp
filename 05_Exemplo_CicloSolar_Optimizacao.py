@@ -20,11 +20,6 @@ t=data[2965:-1,2] #ciclo 23 + ciclo 24
 y=data[2965:-1,3]
 yerr = np.ones_like(t)
 
-pl.figure()
-pl.plot(t,y,'.')
-pl.grid()
-pl.show()
-
 ########## USAR PROCESSOS GAUSSIANOS ##########
 from george import kernels, GP, HODLRSolver
 import george
@@ -34,7 +29,7 @@ k2 = 100**2*kernels.ExpSine2Kernel((2.0/0.5)**2,135)
 #k3 = 100**2*kernels.ExpSine2Kernel((2.0/1)**2,1200)
 k0 = kernels.WhiteKernel(100)    
 
-kernel = k2 + k0
+kernel = k2 #+ k0
 
     #optimization  - find the “best-fit” hyperparameters
 gp = GP(kernel, mean=np.mean(y))
@@ -43,6 +38,22 @@ gp.compute(t,yerr)
 print(gp.lnlikelihood(y))
 print(gp.grad_lnlikelihood(y))
 print(kernel) #kernel  inicial
+
+mu, cov = gp.predict(y, t) #mean mu and covariance cov
+std = np.sqrt(np.diag(cov))
+
+    #Graficos todos xpto - kernel inicial
+pl.figure()
+pl.plot(t,y,'.')
+pl.grid()
+pl.show()
+pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
+pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
+pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
+pl.plot(t, mu, color="r", alpha=1, lw=0.9)
+#pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
+pl.xlabel("$tempo$")
+pl.ylabel("$manchas$")
 
 ########## OPTIMIZAR HIPERPARAMETROS ##########
 import scipy.optimize as op
@@ -80,21 +91,25 @@ print(kernel) #kernel final
 ########## PARTE GRAFICA ##########
     #Compute the predicted values of the function at a fine grid of points 
 #conditioned on the observed data
-x=t
+#x=t
 #x = np.linspace(1996.124, 2008.958, 155) #ciclo 23
 #x = np.linspace(min(t), max(t), len(t))
 #x = np.linspace(1996.5, 2009, len(t))
 #x = np.linspace(max(t),2050,(2050-max(t))*12) #previsao ?
 #x=np.linspace(min(t),2050,(2050-min(t))*12)
-mu, cov = gp.predict(y, x) #mean mu and covariance cov
+mu, cov = gp.predict(y, t) #mean mu and covariance cov
 std = np.sqrt(np.diag(cov))
 
-    #Graficos todos xpto
+    #Graficos todos xpto - kernel final
+pl.figure()
+pl.plot(t,y,'.')
+pl.grid()
+pl.show()
+pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
+pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
+pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
+pl.plot(t, mu, color="r", alpha=1, lw=0.9)
+#pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
+pl.xlabel("$tempo$")
+pl.ylabel("$manchas$")
 
-pl.fill_between(x, mu+std, mu-std, color="k", alpha=0.1)
-pl.plot(x, mu+std, color="k", alpha=1, lw=0.25)
-pl.plot(x, mu-std, color="k", alpha=1, lw=0.25)
-pl.plot(x, mu, color="r", alpha=1, lw=0.9)
-pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
-pl.xlabel("$x$")
-pl.ylabel("$y$")
