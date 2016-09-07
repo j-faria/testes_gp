@@ -1,2 +1,2 @@
 # testes_gp
-Exemplos usados para trabalhar com processos gaussianos
+Exemplos usados para trabalhar com processos gaussianos changes
