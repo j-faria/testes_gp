@@ -4,28 +4,40 @@ Created on Wed Sep  7 11:06:31 2016
 
 @author: camacho
 """
-#   Só foi testado com uma kernel(ExpSquared) mas comparando  os valores obtidos por este script
+#   Só foi testado com uma kernel(ExpSquared) mas comparando os valores obtidos por este script
 #e os valores obtidos pelo george usando o lnlikelihood, o george até agora é melhor.
 
 import numpy as np
-#import matplotlib.pyplot as pl
 from Kernel import *
-pl.close("all") #fecha todas as figuras abertas anteriormente
+#import matplotlib.pyplot as pl
+#pl.close("all") #fecha todas as figuras abertas anteriormente
 
 ########## Dados Iniciais ##########
-# Retirado do 01_Exemplo_simples
-np.random.seed(10)  #Generate some fake noisy data.
-x = 10 * np.sort(np.random.rand(20))
-yerr = 0.2 * np.ones_like(x)
-y = np.sin(x) + yerr * np.random.randn(len(x))
-#pl.figure()
-#pl.plot(x,y,'*') #faz o plot de (x,y) com estrelinhas
+## Retirado do 01_Exemplo_simples
+#np.random.seed(10)  #Generate some fake noisy data.
+#x = 10 * np.sort(np.random.rand(20))
+#yerr = 0.2 * np.ones_like(x)
+#y = np.sin(x) + yerr * np.random.randn(len(x))
 
+data= np.loadtxt('SN_m_tot_V2.0.txt') #data[linha,coluna]
+#x=data[:,2] #todos os ciclos
+#y=data[:,3]
+x=data[2965:3120,2] #ciclo 23
+y=data[2965:3120,3]
+#x=data[2965:-1,2] #ciclo 23 + ciclo 24
+#y=data[2965:-1,3]
+yerr =0.2*np.ones_like(x)
 
 ########## definir kernel a usar e parametros ##########
-kernel = ExpSquared
-theta = 1
-l = 1
+#kernel = ExpSquared
+#theta = 1
+#l = 1
+#x1=x
+#x2=x
+kernel = ExpSineSquared
+theta = 100
+l = 0.5
+P = 135
 x1=x
 x2=x
 
@@ -48,12 +60,12 @@ if kernel == ExpSquared:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(theta,l,x1[i],x2[j])
         
     K_2star=kernel(theta,l,K_star,K_star)
     
-    # PONTO 3 e 4
+    #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
     L_trans = L.T
     L_inv = np.linalg.inv(L)
@@ -79,7 +91,7 @@ elif kernel == ExpSineSquared or kernel == Local_ExpSineSquared:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(theta,l,P,x1[i],x2[j])
         
     K_2star=kernel(theta,l,P,K_star,K_star)
@@ -110,7 +122,7 @@ elif kernel == RatQuadratic:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(theta,l,alpha,x1[i],x2[j])
         
     K_2star=kernel(theta,l,alpha,K_star,K_star)
@@ -141,7 +153,7 @@ elif kernel == Linear:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(thetab,thetav,c,x1[i],x2[j])
         
     K_2star=kernel(thetab,thetav,c,K_star,K_star)
