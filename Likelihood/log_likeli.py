@@ -160,5 +160,3 @@ elif kernel == Linear:
     n=len(x)
     log_p = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) - n*0.5*np.log(2*np.pi)
     print(log_p)
-else:
-    print("Qual é  a kernel?")
