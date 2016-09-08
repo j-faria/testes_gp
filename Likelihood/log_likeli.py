@@ -10,7 +10,7 @@ Created on Wed Sep  7 11:06:31 2016
 import numpy as np
 #import matplotlib.pyplot as pl
 from Kernel import *
-pl.close("all") #fecha todas as figuras abertas anteriormente
+#pl.close("all") #fecha todas as figuras abertas anteriormente
 
 ########## Dados Iniciais ##########
 # Retirado do 01_Exemplo_simples
@@ -48,7 +48,7 @@ if kernel == ExpSquared:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(theta,l,x1[i],x2[j])
         
     K_2star=kernel(theta,l,K_star,K_star)
@@ -79,7 +79,7 @@ elif kernel == ExpSineSquared or kernel == Local_ExpSineSquared:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(theta,l,P,x1[i],x2[j])
         
     K_2star=kernel(theta,l,P,K_star,K_star)
@@ -110,7 +110,7 @@ elif kernel == RatQuadratic:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(theta,l,alpha,x1[i],x2[j])
         
     K_2star=kernel(theta,l,alpha,K_star,K_star)
@@ -141,7 +141,7 @@ elif kernel == Linear:
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
-        for j in range(len(xstar)):
+        for j in range(len(x)):
             K_star[i]=kernel(thetab,thetav,c,x1[i],x2[j])
         
     K_2star=kernel(thetab,thetav,c,K_star,K_star)
