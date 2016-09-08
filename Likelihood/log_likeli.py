@@ -4,6 +4,9 @@ Created on Wed Sep  7 11:06:31 2016
 
 @author: camacho
 """
+#   Só foi testado com uma kernel(ExpSquared) mas comparando  os valores obtidos por este script
+#e os valores obtidos pelo george usando o lnlikelihood, o george até agora é melhor.
+
 import numpy as np
 import matplotlib.pyplot as pl
 from Kernel import *
