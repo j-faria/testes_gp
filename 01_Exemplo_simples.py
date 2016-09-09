@@ -13,7 +13,7 @@ import matplotlib.pyplot as pl
 pl.close("all") #fecha todas as figuras anteriores
 
     #Generate some fake noisy data.
-x = 10 * np.sort(np.random.rand(20))
+x = 10 * np.sort(np.random.rand(2000))
 yerr = 0.2 * np.ones_like(x)
 y = np.sin(x) + yerr * np.random.randn(len(x))
 pl.figure()
