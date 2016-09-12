@@ -15,19 +15,19 @@ import matplotlib.pyplot as pl
 
 ########## Dados Iniciais ##########
 # Retirado do 01_Exemplo_simples
-#np.random.seed(10)  #Generate some fake noisy data.
-#x = 10 * np.sort(np.random.rand(20))
-#yerr = 0.2 * np.ones_like(x)
-#y = np.sin(x) + yerr * np.random.randn(len(x))
+np.random.seed(10)  #Generate some fake noisy data.
+x = 10 * np.sort(np.random.rand(20))
+yerr = 0.2 * np.ones_like(x)
+y = np.sin(x) + yerr * np.random.randn(len(x))
 
 #data= np.loadtxt('SN_m_tot_V2.0.txt') #data[linha,coluna]
 #x=data[2965:3120,2] #ciclo 23
 #y=data[2965:3120,3]
 #yerr =0.2*np.ones_like(x)
 
-x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
-y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
-yerr=0.3 * np.ones_like(x)
+#x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
+#y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
+#yerr=0.3 * np.ones_like(x)
 
 #pl.plot(x,y,"*")
 
@@ -71,8 +71,12 @@ if kernel is ExpSquared:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L)))- n*0.5*np.log(2*np.pi)
-    print(log_p)
+    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)
+    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)            
+    print(log_p1)
+    print(log_p2)
 ##########
 elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     #calcular matrix de covariancia K, K* e K**
@@ -99,8 +103,12 @@ elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) - n*0.5*np.log(2*np.pi)
-    print(log_p)
+    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)
+    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)            
+    print(log_p1)
+    print(log_p2)
 ##########
 elif kernel is RatQuadratic:   
     #calcular matrix de covariancia K, K* e K**
@@ -127,8 +135,12 @@ elif kernel is RatQuadratic:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) - n*0.5*np.log(2*np.pi)
-    print(log_p)
+    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)
+    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)            
+    print(log_p1)
+    print(log_p2)
 ##########
 elif kernel is Linear:
     #calcular matrix de covariancia K, K* e K**
@@ -158,8 +170,12 @@ elif kernel is Linear:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) - n*0.5*np.log(2*np.pi)
-    print(log_p)
+    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)
+    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)            
+    print(log_p1)
+    print(log_p2)
 ##########
 else:
     print("Qual é a kernel?")
