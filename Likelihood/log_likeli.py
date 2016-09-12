@@ -64,7 +64,7 @@ if kernel is ExpSquared:
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
     L_inv= np.linalg.inv(L)
-    K_inv= np.linalg.inv(K)
+    K_inv= np.dot(L_inv,L.T)
     
     y = np.array(y)
     ystar_mean = np.dot(np.dot(K_star,K_inv),y)
@@ -94,7 +94,7 @@ elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
     L_inv= np.linalg.inv(L)
-    K_inv= np.linalg.inv(K)
+    K_inv= np.dot(L_inv,L.T)
     
     y = np.array(y)
     ystar_mean = np.dot(np.dot(K_star,K_inv),y)
@@ -124,7 +124,7 @@ elif kernel is RatQuadratic:
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
     L_inv= np.linalg.inv(L)
-    K_inv= np.linalg.inv(K)
+    K_inv= np.dot(L_inv,L.T)
     
     y = np.array(y)
     ystar_mean = np.dot(np.dot(K_star,K_inv),y)
@@ -153,10 +153,8 @@ elif kernel is Linear:
     
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
-#    L_trans = L.T
     L_inv = np.linalg.inv(L)
-#    K_inv= np.dot( np.linalg.inv(L_trans), L_inv)
-#    K_inv= np.linalg.inv(K)
+    K_inv= np.dot(L_inv,L.T)
     
     y = np.array(y)
     ystar_mean = np.dot(np.dot(K_star,K_inv),y)
