@@ -51,7 +51,7 @@ K=np.zeros((len(x),len(x)))
 for i in range(len(x)):
     for j in range(len(x)):
         K[i,j]=kernel(theta,l,x1[i],x2[j])
-K=K+yerr*np.identity(len(x))      
+K=K+yerr**2*np.identity(len(x))      
 
 K_star=np.zeros(len(x))
 for i in range(len(x)):
@@ -71,9 +71,6 @@ ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
 
 #Calculo da log likelihood
 n=len(x)
-log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
-            - n*0.5*np.log(2*np.pi)
 log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
-print(log_p1)
 print(log_p2)

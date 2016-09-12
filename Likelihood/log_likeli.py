@@ -52,7 +52,7 @@ if kernel is ExpSquared:
     for i in range(len(x)):
         for j in range(len(x)):
             K[i,j]=kernel(theta,l,x1[i],x2[j])
-    K=K+yerr*np.identity(len(x))      
+    K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
@@ -71,12 +71,9 @@ if kernel is ExpSquared:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
-            - n*0.5*np.log(2*np.pi)
-    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
-    print(log_p1)
-    print(log_p2)
+    print(log_p)
 ##########
 elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     #calcular matrix de covariancia K, K* e K**
@@ -84,7 +81,7 @@ elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     for i in range(len(x)):
         for j in range(len(x)):
             K[i,j]=kernel(theta,l,P,x1[i],x2[j])
-    K=K+yerr*np.identity(len(x))      
+    K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
@@ -103,12 +100,9 @@ elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
-            - n*0.5*np.log(2*np.pi)
-    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
-    print(log_p1)
-    print(log_p2)
+    print(log_p)
 ##########
 elif kernel is RatQuadratic:   
     #calcular matrix de covariancia K, K* e K**
@@ -116,7 +110,7 @@ elif kernel is RatQuadratic:
     for i in range(len(x)):
         for j in range(len(x)):
             K[i,j]=kernel(theta,l,alpha,x1[i],x2[j])
-    K=K+yerr*np.identity(len(x))      
+    K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
@@ -135,12 +129,9 @@ elif kernel is RatQuadratic:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
-            - n*0.5*np.log(2*np.pi)
-    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
-    print(log_p1)
-    print(log_p2)
+    print(log_p)
 ##########
 elif kernel is Linear:
     #calcular matrix de covariancia K, K* e K**
@@ -148,7 +139,7 @@ elif kernel is Linear:
     for i in range(len(x)):
         for j in range(len(x)):
             K[i,j]=kernel(thetab,thetav,c,x1[i],x2[j])
-    K=K+yerr*np.identity(len(x))      
+    K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
@@ -170,12 +161,9 @@ elif kernel is Linear:
     
     #Calculo da log likelihood
     n=len(x)
-    log_p1 = -0.5*np.dot(np.dot(y.T,K_inv),y) - sum(np.log(np.diag(L))) \
-            - n*0.5*np.log(2*np.pi)
-    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
-    print(log_p1)
-    print(log_p2)
+    print(log_p)
 ##########
 else:
     print("Qual é a kernel?")
