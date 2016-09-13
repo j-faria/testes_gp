@@ -10,16 +10,16 @@ import numpy as np
 import matplotlib.pyplot as pl
 pl.close("all") #fecha todas as figuras anteriores
 
-## EXEMPLO 1 - Generate some fake noisy data.
-#x = 10 * np.sort(np.random.rand(20))
-#yerr = 0.2 * np.ones_like(x)
-#y = np.sin(x) + yerr * np.random.randn(len(x))
+# EXEMPLO 1 - Generate some fake noisy data.
+x = 10 * np.sort(np.random.rand(20))
+yerr = 0.2 * np.ones_like(x)
+y = np.sin(x) + yerr * np.random.randn(len(x))
 
-# EXEMPLO 2
-x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
-yerr=0.3 * np.ones_like(x)
-y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
-pl.plot(x,y,'*')
+## EXEMPLO 2
+#x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
+#yerr=0.3 * np.ones_like(x)
+#y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
+#pl.plot(x,y,'*')
 ########## CALCULO USANDO O GEOREGE ##########
     #importar o modulo george e a kernel a usar
 import george

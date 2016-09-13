@@ -15,15 +15,15 @@ import matplotlib.pyplot as pl
 
 ########## Dados Iniciais ##########
 # Retirado do 01_Exemplo_simples
-np.random.seed(10)  #Generate some fake noisy data.
-x = 10 * np.sort(np.random.rand(20))
-yerr = 0.2 * np.ones_like(x)
-y = np.sin(x) + yerr * np.random.randn(len(x))
+#np.random.seed(10)  #Generate some fake noisy data.
+#x = 10 * np.sort(np.random.rand(20))
+#yerr = 0.2 * np.ones_like(x)
+#y = np.sin(x) + yerr * np.random.randn(len(x))
 
-#data= np.loadtxt('SN_m_tot_V2.0.txt') #data[linha,coluna]
-#x=data[2965:3120,2] #ciclo 23
-#y=data[2965:3120,3]
-#yerr =0.2*np.ones_like(x)
+data= np.loadtxt('SN_m_tot_V2.0.txt') #data[linha,coluna]
+x=data[2965:3120,2] #ciclo 23
+y=data[2965:3120,3]
+yerr =0.2*np.ones_like(x)
 
 #x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
 #y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
