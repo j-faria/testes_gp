@@ -79,6 +79,7 @@ pl.plot(x,y,'.')
 
 ########## CALCULO USANDO O GEOREGE ##########
     #importar o modulo george e a kernel a usar
+import george
 from george.kernels import ExpSine2Kernel
 
     #Set up the Gaussian process.
@@ -103,8 +104,6 @@ P = 15
 x1=x
 x2=x
 
-#from likelihood_func import *
-#likelihood(kernel,x,x,"theta=1.5","l=2.0","P=15")
 #calcular matrix de covariancia K, K* e K**
 K=np.zeros((len(x),len(x)))
 for i in range(len(x)):
