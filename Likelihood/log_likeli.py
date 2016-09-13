@@ -20,14 +20,9 @@ import matplotlib.pyplot as pl
 #yerr = 0.2 * np.ones_like(x)
 #y = np.sin(x) + yerr * np.random.randn(len(x))
 
-data= np.loadtxt('SN_m_tot_V2.0.txt') #data[linha,coluna]
-x=data[2965:3120,2] #ciclo 23
-y=data[2965:3120,3]
-yerr =0.2*np.ones_like(x)
-
-#x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
-#y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
-#yerr=0.3 * np.ones_like(x)
+x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
+y = [0.55*-3, 0.55*-2, 0.55*-0.6, 0.55*0.4, 0.55*1, 0.55*1.6]
+yerr=0.3 * np.ones_like(x)
 
 #pl.plot(x,y,"*")
 
@@ -37,13 +32,6 @@ theta = 1
 l = 1
 x1=x
 x2=x
-
-#kernel = ExpSineSquared
-#theta = 100
-#l = 0.5
-#P = 135
-#x1=x
-#x2=x
 
 ########## Calculos da log likelihood ##########
 if kernel is ExpSquared:
