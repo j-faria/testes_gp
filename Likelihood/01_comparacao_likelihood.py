@@ -72,6 +72,6 @@ ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
 
 #Calculo da log likelihood
 n=len(x)
-log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
-print(log_p2)
+print(log_p)
