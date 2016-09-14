@@ -154,7 +154,7 @@ elif kernel is RatQuadratic:
 #            - n*0.5*np.log(2*np.pi)            
 #    print(log_p)
 ##########
-elif kernel is Sum_ExpSineSquared_ExpSquared:
+elif kernel is Sum_ExpSineSquared_ExpSquared or kernel is Mul_ExpSineSquared_ExpSquared:
     #calcular matrix de covariancia K, K* e K**
     K=np.zeros((len(x),len(x)))
     for i in range(len(x)):
@@ -183,6 +183,38 @@ elif kernel is Sum_ExpSineSquared_ExpSquared:
     log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
             - n*0.5*np.log(2*np.pi)            
     print(log_p)    
+##########
+elif kernel is ExpSquared_WN:
+    #calcular matrix de covariancia K, K* e K**
+    K=np.zeros((len(x),len(x)))
+    for i in range(len(x)):
+        for j in range(len(x)):
+            K[i,j]=kernel(x1[i],x2[j],ES_theta,ES_l,WN)
+    K=K+yerr**2*np.identity(len(x))
+    K=K+WN**2*np.identity(len(x))      
+    
+    K_star=np.zeros(len(x))
+    for i in range(len(x)):
+        for j in range(len(x)):
+            K_star[i]=kernel(x1[i],x2[j],ES_theta,ES_l,WN)
+        
+    K_2star=kernel(K_star,K_star,ES_theta,ES_l,WN) 
+    
+    #para usar cholesky a matriz tem de ser positiva definida
+    L = np.linalg.cholesky(K)
+    L_inv= np.linalg.inv(L)
+    K_inv= np.dot(L_inv,L.T)
+    
+    y = np.array(y)
+    ystar_mean = np.dot(np.dot(K_star,K_inv),y)
+    ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
+    
+    #Calculo da log likelihood
+    n=len(x)
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+                - n*0.5*np.log(2*np.pi)            
+    print(log_p)
+
 ##########    
 else:
     print("Qual é a kernel?")
