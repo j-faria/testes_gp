@@ -7,6 +7,7 @@ Created on Tue Sep 13 14:45:00 2016
 ##### RASCUNHO - ignorar o que for feito aqui #####
 
 import numpy as np
+import sympy as sp
 from Kernel import *
 
 
@@ -35,3 +36,5 @@ def g(z):
     
 def h(x,y,z):
     return f(x,y)+g(z)
+    
+a=np.kron(x,y)
