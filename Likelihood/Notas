@@ -1,0 +1,5 @@
+Pormenores observados:
+
+- Quando são muitos pontos a likelihood calculada pelo george é mais rápida e obtem melhores resultados do que a desenvolvida  por mim.
+
+- Tenho que arranjar um modo mais eficiente para somar kernel, andar a criar uma kernel nova sempre que quiser andar a somar não é muito prático.
