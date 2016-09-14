@@ -27,7 +27,7 @@ yerr=0.3 * np.ones_like(x)
 #pl.plot(x,y,"*")
 
 ########## definir kernel a usar e parametros ##########
-kernel = ExpSquared 
+kernel = ExpSquared
 theta = 1
 l = 1
 x1=x
@@ -39,15 +39,15 @@ if kernel is ExpSquared:
     K=np.zeros((len(x),len(x)))
     for i in range(len(x)):
         for j in range(len(x)):
-            K[i,j]=kernel(theta,l,x1[i],x2[j])
+            K[i,j]=kernel(x1[i],x2[j],theta,l)
     K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
         for j in range(len(x)):
-            K_star[i]=kernel(theta,l,x1[i],x2[j]) 
+            K_star[i]=kernel(x1[i],x2[j],theta,l) 
         
-    K_2star=kernel(theta,l,K_star,K_star) 
+    K_2star=kernel(K_star,K_star,theta,l,) 
     
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
@@ -69,15 +69,15 @@ elif kernel is ExpSineSquared or kernel is Local_ExpSineSquared:
     K=np.zeros((len(x),len(x)))
     for i in range(len(x)):
         for j in range(len(x)):
-            K[i,j]=kernel(theta,l,P,x1[i],x2[j])
+            K[i,j]=kernel(x1[i],x2[j],theta,l,P)
     K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
         for j in range(len(x)):
-            K_star[i]=kernel(theta,l,P,x1[i],x2[j])
+            K_star[i]=kernel(x1[i],x2[j],theta,l,P)
         
-    K_2star=kernel(theta,l,P,K_star,K_star)
+    K_2star=kernel(K_star,K_star,theta,l,P)
     
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
@@ -99,15 +99,15 @@ elif kernel is RatQuadratic:
     K=np.zeros((len(x),len(x)))
     for i in range(len(x)):
         for j in range(len(x)):
-            K[i,j]=kernel(theta,l,alpha,x1[i],x2[j])
+            K[i,j]=kernel(x1[i],x2[j],theta,l,alpha)
     K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
         for j in range(len(x)):
-            K_star[i]=kernel(theta,l,alpha,x1[i],x2[j])
+            K_star[i]=kernel(x1[i],x2[j],theta,l,alpha)
         
-    K_2star=kernel(theta,l,alpha,K_star,K_star)
+    K_2star=kernel(K_star,K_star,theta,l,alpha)
     
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
@@ -129,15 +129,15 @@ elif kernel is Linear:
     K=np.zeros((len(x),len(x)))
     for i in range(len(x)):
         for j in range(len(x)):
-            K[i,j]=kernel(thetab,thetav,c,x1[i],x2[j])
+            K[i,j]=kernel(x1[i],x2[j],thetab,thetav,c)
     K=K+yerr**2*np.identity(len(x))      
     
     K_star=np.zeros(len(x))
     for i in range(len(x)):
         for j in range(len(x)):
-            K_star[i]=kernel(thetab,thetav,c,x1[i],x2[j])
+            K_star[i]=kernel(x1[i],x2[j],thetab,thetav,c)
         
-    K_2star=kernel(thetab,thetav,c,K_star,K_star)
+    K_2star=kernel(K_star,K_star,thetab,thetav,c)
     
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
