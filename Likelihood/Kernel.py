@@ -27,7 +27,7 @@ def ExpSineSquared(x1, x2, ESS_theta, ESS_l, ESS_P):
     f3 = (x1-x2)
     return f1*np.exp(-2*(np.sin(np.pi*f3/ESS_P))**2/f2)
 
-# Locally Periodic Kernel
+# Locally Periodic Kernel (identico a fazer ExpSineSquared*ExpSquared)
 def Local_ExpSineSquared(x1, x2, LESS_theta, LESS_l, LESS_P): 
     f1 = LESS_theta**2
     f2 = LESS_l**2
@@ -41,9 +41,9 @@ def Local_ExpSineSquared(x1, x2, LESS_theta, LESS_l, LESS_P):
 #    f2 = L_thetav**2
 #    return f1+f2*(x1-L_c)*(x2-L_c)
     
-#Soma de Periodic com Squared Exponential (ExpSineSquared + ExpSquared)
+#Soma de Periodic com Squared Exponential (ExpSineSquared+ExpSquared)
 def Sum_ExpSineSquared_ExpSquared(x1, x2, ESS_theta, ESS_l, ESS_P, ES_theta, ES_l):
-    return ExpSineSquared(x1,x2,ESS_theta,ESS_l,ESS_P) + ExpSquared(x1,x2,ES_theta,ES_l)
+    return ExpSineSquared(x1,x2,ESS_theta,ESS_l,ESS_P)+ExpSquared(x1,x2,ES_theta,ES_l)
     
 # Squared Exponential Kernel com white noise
 def ExpSquared_WN(x1, x2, ES_theta, ES_l, WN):
@@ -51,3 +51,10 @@ def ExpSquared_WN(x1, x2, ES_theta, ES_l, WN):
     f2 = ES_l**2
     f3 = (x1-x2)**2
     return f1*np.exp(-0.5*f3/f2)
+    
+# Periodic Kernel com white noise
+def ExpSineSquared_WN(x1, x2, ESS_theta, ESS_l, ESS_P,WN): 
+    f1 = ESS_theta**2
+    f2 = ESS_l**2
+    f3 = (x1-x2)
+    return f1*np.exp(-2*(np.sin(np.pi*f3/ESS_P))**2/f2)
