@@ -42,8 +42,8 @@ from Kernel import *
 
 #definir kernel a usar
 kernel = ExpSquared 
-theta = 1
-l = 1
+ES_theta = 1
+ES_l = 1
 x1=x
 x2=x
 
@@ -51,15 +51,15 @@ x2=x
 K=np.zeros((len(x),len(x)))
 for i in range(len(x)):
     for j in range(len(x)):
-        K[i,j]=kernel(theta,l,x1[i],x2[j])
+        K[i,j]=kernel(x1[i],x2[j],ES_theta,ES_l)
 K=K+yerr**2*np.identity(len(x))      
 
 K_star=np.zeros(len(x))
 for i in range(len(x)):
     for j in range(len(x)):
-        K_star[i]=kernel(theta,l,x1[i],x2[j]) 
+        K_star[i]=kernel(x1[i],x2[j],ES_theta,ES_l) 
     
-K_2star=kernel(theta,l,K_star,K_star) 
+K_2star=kernel(K_star,K_star,ES_theta,ES_l) 
 
 #para usar cholesky a matriz tem de ser positiva definida
 L = np.linalg.cholesky(K)
