@@ -307,56 +307,118 @@ def exemplo_5():
  
 ###############################################################################   
 
-#def exemplo_6():
-#        ########## EXEMPLO 6 - Linear ##########
-#    np.random.seed(11119)
-#    x=100 * np.sort(np.random.rand(50))
-#    yerr = 0.5 * np.ones_like(x)
-#    y = np.sort(x*np.random.randn(len(x)) + yerr*np.random.randn(len(x)))
-#    #pl.plot(x,y,'*')
-#    
-#    ##### CALCULO  DA LIKELIHOOD ###
-#    #definir kernel a usar
-#    kernel = Linear
-#    x1=x
-#    x2=x
-#    L_thetab = 0.62
-#    L_thetav = 0.1
-#    L_c=50
-#    
-#    #calcular matrix de covariancia K, K* e K**
-#    K=np.zeros((len(x),len(x)))
-#    for i in range(len(x)):
-#        for j in range(len(x)):
-#            K[i,j]=kernel(x1[i],x2[j],L_thetab,L_thetav,L_c)
-#    K=K+yerr**2*np.identity(len(x))      
-#    
-#    K_star=np.zeros(len(x))
-#    for i in range(len(x)):
-#        for j in range(len(x)):
-#            K_star[i]=kernel(x1[i],x2[j],L_thetab,L_thetav,L_c)
-#        
-#    K_2star=kernel(K_star,K_star,L_thetab,L_thetav,L_c)
-#    
-#    #para usar cholesky a matriz tem de ser positiva definida
-#    L = np.linalg.cholesky(K)
-#    L_inv = np.linalg.inv(L)
-#    K_inv= np.dot(L_inv,L.T)
-#    
-#    y = np.array(y)
-#    ystar_mean = np.dot(np.dot(K_star,K_inv),y)
-#    ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
-#    
-#    #Calculo da log likelihood
-#    n=len(x)
-#    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
-#            - n*0.5*np.log(2*np.pi)            
-#    print('ex6',log_p)
+def exemplo_6():
+        ########## EXEMPLO 6 - Linear ##########
+    np.random.seed(11119)
+    x=100 * np.sort(np.random.rand(50))
+    yerr = 0.5 * np.ones_like(x)
+    y = np.sort(x*np.random.randn(len(x)) + yerr*np.random.randn(len(x)))
+    #pl.plot(x,y,'*')
+    
+    ##### CALCULO  DA LIKELIHOOD ###
+    #definir kernel a usar
+    kernel = Linear
+    x1=x
+    x2=x
+    L_thetab = 0.62
+    L_thetav = 0.1
+    L_c=50
+    
+    #calcular matrix de covariancia K, K* e K**
+    K=np.zeros((len(x),len(x)))
+    for i in range(len(x)):
+        for j in range(len(x)):
+            K[i,j]=kernel(x1[i],x2[j],L_thetab,L_thetav,L_c)
+    K=K+yerr**2*np.identity(len(x))      
+    
+    K_star=np.zeros(len(x))
+    for i in range(len(x)):
+        for j in range(len(x)):
+            K_star[i]=kernel(x1[i],x2[j],L_thetab,L_thetav,L_c)
+        
+    K_2star=kernel(K_star,K_star,L_thetab,L_thetav,L_c)
+    
+    #para usar cholesky a matriz tem de ser positiva definida
+    L = np.linalg.cholesky(K)
+    L_inv = np.linalg.inv(L)
+    K_inv= np.dot(L_inv,L.T)
+    
+    y = np.array(y)
+    ystar_mean = np.dot(np.dot(K_star,K_inv),y)
+    ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
+    
+    #Calculo da log likelihood
+    n=len(x)
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)            
+    print('ex6',log_p)
     
 ###############################################################################
+def exemplo_7():
+    ########## EXEMPLO 5 - ExpSineSquared com white noise ##########
+    x = 10 * np.sort(np.random.rand(20))
+    yerr = 0.2 * np.ones_like(x)
+    y = np.sin(x) + yerr * np.random.randn(len(x))
+    
+    #### CALCULO USANDO O GEORGE ###
+        #Set up the Gaussian process.
+    k1 = 10**2*ExpSine2Kernel(2.0/1**2,4)
+    k2 = WhiteKernel(2**2)
+    kernel = k1+k2
+    gp = george.GP(kernel)
+    
+        #Pre-compute the factorization of the matrix.
+    gp.compute(x,yerr)
+    
+        #Compute the log likelihood.
+    print('george ex7',gp.lnlikelihood(y))
+    
+    
+    ##### CALCULO  DA LIKELIHOOD ###
+    #definir kernel a usar
+    kernel = ExpSineSquared_WN
+    x1=x
+    x2=x
+    ESS_theta = 1.5
+    ESS_l = 2.0
+    ESS_P = 15
+    WN = 2
+    
+    #calcular matrix de covariancia K, K* e K**
+    K=np.zeros((len(x),len(x)))
+    for i in range(len(x)):
+        for j in range(len(x)):
+            K[i,j]=kernel(x1[i],x2[j],ESS_theta,ESS_l,ESS_P,WN)
+    K=K+yerr**2*np.identity(len(x))
+    K=K+WN**2*np.identity(len(x))      
+    
+    K_star=np.zeros(len(x))
+    for i in range(len(x)):
+        for j in range(len(x)):
+            K_star[i]=kernel(x1[i],x2[j],ESS_theta,ESS_l,ESS_P,WN)
+        
+    K_2star=kernel(K_star,K_star,ESS_theta,ESS_l,ESS_P,WN) 
+    
+    #para usar cholesky a matriz tem de ser positiva definida
+    L = np.linalg.cholesky(K)
+    L_inv= np.linalg.inv(L)
+    K_inv= np.dot(L_inv,L.T)
+    
+    y = np.array(y)
+    ystar_mean = np.dot(np.dot(K_star,K_inv),y)
+    ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
+    
+    #Calculo da log likelihood
+    n=len(x)
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+                - n*0.5*np.log(2*np.pi)            
+    print('ex7',log_p)
+
+###############################################################################    
 exemplo_1() #ExpSquared
 exemplo_2() #ExpSineSquared 
 exemplo_3() #Local_ExpSineSquared
 exemplo_4() #Soma de ExpSineSquared com ExpSquared
 exemplo_5() #ExpSquared com white noise
 #exemplo_6() #Linear
+exemplo_7()
