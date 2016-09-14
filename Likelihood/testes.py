@@ -35,6 +35,6 @@ def g(z):
     return z**3
     
 def h(x,y,z):
-    return f(x,y)+g(z)
+    return f(x,y)*g(z)
     
 a=np.kron(x,y)
