@@ -355,7 +355,7 @@ def exemplo_6():
     
 ###############################################################################
 def exemplo_7():
-    ########## EXEMPLO 5 - ExpSineSquared com white noise ##########
+    ########## EXEMPLO 7 - ExpSineSquared com white noise ##########
     x = 10 * np.sort(np.random.rand(20))
     yerr = 0.2 * np.ones_like(x)
     y = np.sin(x) + yerr * np.random.randn(len(x))
