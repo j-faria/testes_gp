@@ -7,14 +7,34 @@ Created on Tue Sep 13 10:51:16 2016
 import numpy as np
 import matplotlib.pyplot as pl
 pl.close("all") #fecha todas as figuras anteriores
+from time import time
 
 import george
 from george.kernels import *
 from Kernel import *
-    
+
+# np.random.seed(1000)
+
+def lnlike(K, r):
+    from scipy.linalg import cho_factor, cho_solve
+    L1 = cho_factor(K)  # tuple (L, lower)
+    # this is K^-1*(r)
+    sol = cho_solve(L1, r)
+
+    n = r.size
+
+    logLike = -0.5*np.dot(r, sol) \
+              - np.sum(np.log(np.diag(L1[0]))) \
+              - n*0.5*np.log(2*np.pi)
+
+    return logLike
+
+
 def exemplo_1():
     ########## EXEMPLO 1 - Generate some fake noisy data. ##########
-    x = 10 * np.sort(np.random.rand(20))
+    # np.random.seed(1000)
+
+    x = 10 * np.sort(np.random.rand(2000))
     yerr = 0.2 * np.ones_like(x)
     y = np.sin(x) + yerr * np.random.randn(len(x))
     
@@ -28,7 +48,9 @@ def exemplo_1():
     gp.compute(x,yerr)
     
         #Compute the log likelihood.
-    print('george ex1',gp.lnlikelihood(y))
+    start = time()
+    log_p_george = gp.lnlikelihood(y)
+    print 'Took %f seconds' % (time() - start), ('george ex1',log_p_george)
     
     
     #### CALCULO  DA LIKELIHOOD ### 
@@ -46,27 +68,35 @@ def exemplo_1():
             K[i,j]=kernel(x1[i],x2[j],ES_theta,ES_l)
     K=K+yerr**2*np.identity(len(x))      
     
-    K_star=np.zeros(len(x))
-    for i in range(len(x)):
-        for j in range(len(x)):
-            K_star[i]=kernel(x1[i],x2[j],ES_theta,ES_l)
+    # K_star=np.zeros(len(x))
+    # for i in range(len(x)):
+    #     for j in range(len(x)):
+    #         K_star[i]=kernel(x1[i],x2[j],ES_theta,ES_l)
         
-    K_2star=kernel(K_star,K_star,ES_theta,ES_l) 
+    # K_2star=kernel(K_star,K_star,ES_theta,ES_l)
     
+    start = time()
     #para usar cholesky a matriz tem de ser positiva definida
     L = np.linalg.cholesky(K)
     L_inv= np.linalg.inv(L)
-    K_inv= np.dot(L_inv,L.T)
+    # K_inv= np.dot(L_inv,L.T)
     
     y = np.array(y)
-    ystar_mean = np.dot(np.dot(K_star,K_inv),y)
-    ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
+    # ystar_mean = np.dot(np.dot(K_star,K_inv),y)
+    # ystar_var = np.dot(np.dot(K_star,K_inv),K_star.T)
     
     #Calculo da log likelihood
     n=len(x)
-    log_p2 = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
-                - n*0.5*np.log(2*np.pi)            
-    print('ex1',log_p2)
+    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+            - n*0.5*np.log(2*np.pi)            
+
+    print 'Took %f seconds' % (time() - start), ('ex1',log_p)
+
+    start = time()
+    log_p = lnlike(K, y)
+    print 'Took %f seconds' % (time() - start), ('ex1 correct',log_p)    
+
+    assert np.allclose(log_p, log_p_george)
 
 ###############################################################################
 def exemplo_2():
