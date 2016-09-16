@@ -5,8 +5,8 @@ Created on Tue Sep 13 10:51:16 2016
 @author: camacho
 """
 import numpy as np
-import matplotlib.pyplot as pl
-pl.close("all") #fecha todas as figuras anteriores
+#import matplotlib.pyplot as pl
+#pl.close("all") #fecha todas as figuras anteriores
 from time import time
 
 import george

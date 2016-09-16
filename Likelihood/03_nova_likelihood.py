@@ -5,8 +5,8 @@ Created on Thu Sep 15 15:46:50 2016
 @author: camacho
 """
 import numpy as np
-import matplotlib.pyplot as pl
-pl.close("all") #fecha todas as figuras anteriores
+#import matplotlib.pyplot as pl
+#pl.close("all") #fecha todas as figuras anteriores
 from time import time
 
 import george
@@ -28,11 +28,11 @@ def lnlike(K, r):
     return logLike
 
 #### DADOS ####################################################################
-np.random.seed(1000)
+#np.random.seed(1000)
 x = 10 * np.sort(np.random.rand(2000))
 yerr = 0.2 * np.ones_like(x)
 y = np.sin(x) + yerr * np.random.randn(len(x))
-pl.plot(x,y,'.')
+#pl.plot(x,y,'.')
 
 #### CALCULO USANDO O GEORGE ##################################################
     #Set up the Gaussian process.
@@ -67,7 +67,6 @@ start = time()
 #para usar cholesky a matriz tem de ser positiva definida
 L = np.linalg.cholesky(K)
 L_inv= np.linalg.inv(L)
-# K_inv= np.dot(L_inv,L.T)
 
 y = np.array(y)
 
@@ -86,4 +85,4 @@ print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)
 assert np.allclose(log_p,log_p_correct, log_p_george)
 
 #### CONCLUSOES
-#A minha versão demora quase 8 vezes mais 
+#A minha versão demora cerca de 8 vezes mais 
