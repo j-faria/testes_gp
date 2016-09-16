@@ -9,6 +9,7 @@ Created on Tue Sep 13 14:45:00 2016
 import numpy as np
 import sympy as sp
 from Kernel import *
+ 
 
 class Combinable:
     def __init__(self, f):
@@ -26,31 +27,57 @@ class Combined(Combinable):
         self.f = f
         self.g = g
 
+    def argumentcount(self): #conta as variaveis de x
+        return self.__code__.co_argcount
+        
     def __call__(self, *args):
-        return self.f(args[0]) + self.g(args[1])
+        countf=argumentcount(self.f)
+        countg=argumentcount(self.g)
+        return self.f(args[0],args[1]) + self.g(args[2],args[3])        
+        #return self.f(args[countf-1]) + self.g(args[countf+countg-1])
+        #return self.f() + self.g()
 
 #@Combinable
-def a(x):
-    return x**2 + x
+def a(x,y):
+    return float(x)**2 + x + y
 
-def b(y):
-    return float(y**2) + 1
+def b(x,y,z):
+    return x + float(y)**2 + 1 + z
 
 def c(z):
     return z
 
-#def main():
-#    d = a + b + c
-#    print d(2,1)
-#
-#if __name__ == "__main__":
-#    main()
-
 d=Combined(a,b)
-e=Combined(d,c)
-print(d(1,2))  #funciona
-print(e(1,2,1)) #nao funciona
-  
+print(d(1,2,3,4,1))  #funciona
+#e=Combined(d,c)
+#print(e(1,2,1)) #nao funciona
+
+###############################################################################
+#def callback(fn):
+#    def inner(self, *args):
+#        return _do_callback(fn.__get__(self, type(self)), self.log, *args)
+#    return inner
+#
+#class Foo(object):
+#    def __init__(self):
+#        self.log = Log('Foo')
+#
+#@callback
+#def cb1_wrapped(self,x):
+#    pass
+
+def wrap(bound_method):
+    return lambda *args: _do_callback(bound_method, bound_method.__self__.log, args)
+
+dd=callback(d)
+
+######
+#def argumentcount(x): #conta as variaveis da função
+#    return x.__code__.co_argcount
+#print(argumentcount(dd))
+######
+
+###############################################################################
 #class combine:                  #somar duas funções com  variaveis iguais
 #    def __init__(self, f):
 #        self.f = f
