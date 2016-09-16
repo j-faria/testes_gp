@@ -10,45 +10,109 @@ import numpy as np
 import sympy as sp
 from Kernel import *
 
-class combine:                  #somar duas funções com  variaveis iguais
+class Combinable:
     def __init__(self, f):
         self.f = f
-    def __call__(self, x):
-        return self.f(x)
-    def __add__(self, other):
-        return combine(lambda x: self(x) + other(x))
-###############################################################################
-import operator
-class operable:                 #permite somar, multiplicar, dividir 
-    def __init__(self, f):
+
+    def __call__(self, *args):
+        return self.f(args)
+
+    def __add__(self, g):
+        return Combined(self.f, g) 
+
+
+class Combined(Combinable):
+    def __init__(self, f, g):
         self.f = f
-    def __call__(self, x):
-        return self.f(x)
- 
-def op_to_function_op(op):
-    def function_op(self, operand):
-        def f(x):
-            return op(self(x), operand(x))
-        return operable(f)
-    return function_op
- 
-for name, op in [(name, getattr(operator, name)) for name in dir(operator) if "__" in name]:
-    try:
-        op(1,2)
-    except TypeError:
-        pass
-    else:
-        setattr(operable, name, op_to_function_op(op))        
-        
-@operable
+        self.g = g
+
+    def __call__(self, *args):
+        return self.f(args[0]) + self.g(args[1])
+
+#@Combinable
 def a(x):
-    return  float(2+x)
-    
-def b(x):
-    return float(x**3)
-    
-c=a+b
-print(c(2))
+    return x**2 + x
+
+def b(y):
+    return float(y**2) + 1
+
+def c(z):
+    return z
+
+#def main():
+#    d = a + b + c
+#    print d(2,1)
+#
+#if __name__ == "__main__":
+#    main()
+
+d=Combined(a,b)
+e=Combined(d,c)
+print(d(1,2))  #funciona
+print(e(1,2,1)) #nao funciona
+  
+#class combine:                  #somar duas funções com  variaveis iguais
+#    def __init__(self, f):
+#        self.f = f
+#    def __call__(self, x):
+#        return self.f(x)
+#    def __add__(self, other):
+#        return combine(lambda x, y: self(x,y) + other(x,y))
+
+#class combine:                 
+#    def __init__(self, f):
+#        self.f = f
+#    def __call__(self, *pars):
+#        return self.f(*pars)
+#    def __add__(self, other):
+#        return combine(lambda *pars: self + other)  
+#        
+#@combine
+#
+#def a(x):
+#    return  float(2+x)
+#    
+#def b(y):
+#    return float(y**3)
+#    
+#c=a+b
+#print(c(2)) 
+#        
+        
+        
+        
+###############################################################################
+#import operator
+#class operable:                 #permite somar, multiplicar, dividir 
+#    def __init__(self, f):
+#        self.f = f
+#    def __call__(self, x):
+#        return self.f(x)
+# 
+#def op_to_function_op(op):
+#    def function_op(self, operand):
+#        def f(x):
+#            return op(self(x), operand(x))
+#        return operable(f)
+#    return function_op
+# 
+#for name, op in [(name, getattr(operator, name)) for name in dir(operator) if "__" in name]:
+#    try:
+#        op(1,2)
+#    except TypeError:
+#        pass
+#    else:
+#        setattr(operable, name, op_to_function_op(op))        
+#        
+#@operable
+#def a(x):
+#    return  float(2+x)
+#    
+#def b(x):
+#    return float(x**3)
+#    
+#c=a+b
+#print(c(2))
 
 
 #x = [-1.5, -1, -0.75, -0.4, -0.25, 0]
