@@ -5,12 +5,10 @@ Created on Tue Sep 13 14:45:00 2016
 @author: camacho
 """
 ##### RASCUNHO - ignorar o que for feito aqui #####
-
 import numpy as np
 import sympy as sp
 from Kernel import *
  
-
 class Combinable:
     def __init__(self, f):
         self.f = f
@@ -21,21 +19,21 @@ class Combinable:
     def __add__(self, g):
         return Combined(self.f, g) 
 
-
 class Combined(Combinable):
     def __init__(self, f, g):
         self.f = f
         self.g = g
 
-    def argumentcount(self): #conta as variaveis de x
-        return self.__code__.co_argcount
-        
+#    def argumentcount(self): #conta as variaveis de x
+#        return self.__code__.co_argcount   
+#    def addargument(self,i):
+#        return args[i]
+    
     def __call__(self, *args):
-        countf=argumentcount(self.f)
-        countg=argumentcount(self.g)
-        return self.f(args[0],args[1]) + self.g(args[2],args[3])        
-        #return self.f(args[countf-1]) + self.g(args[countf+countg-1])
-        #return self.f() + self.g()
+        #arranjar maneira de adicionar args[i]  consoante o valor de i
+        return self.f(args[0],args[1]) + self.g(args[2],args[3],args[4])    # funciona
+        print(countf)
+
 
 #@Combinable
 def a(x,y):
@@ -52,6 +50,27 @@ print(d(1,2,3,4,1))  #funciona
 #e=Combined(d,c)
 #print(e(1,2,1)) #nao funciona
 
+#def argumentcount(x): #conta as variaveis de x
+#    return x.__code__.co_argcount
+#run=argumentcount(a)
+#
+#xx=()
+#for i  in range(run):
+#    xx=xx+('args[%i]' %i,)
+#
+
+
+
+
+
+###############################################################################
+#def argumentcount(x): #conta as variaveis de x
+#    return x.__code__.co_argcount
+
+#for i in range(0, 10, 3):
+#    pref = "g%02i_" % (i/3)
+#print(pref)
+
 ###############################################################################
 #def callback(fn):
 #    def inner(self, *args):
@@ -66,10 +85,10 @@ print(d(1,2,3,4,1))  #funciona
 #def cb1_wrapped(self,x):
 #    pass
 
-def wrap(bound_method):
-    return lambda *args: _do_callback(bound_method, bound_method.__self__.log, args)
-
-dd=callback(d)
+#def wrap(bound_method):
+#    return lambda *args: _do_callback(bound_method, bound_method.__self__.log, args)
+#
+#dd=callback(d)
 
 ######
 #def argumentcount(x): #conta as variaveis da função
