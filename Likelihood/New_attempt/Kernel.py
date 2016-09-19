@@ -39,7 +39,7 @@ def Local_ExpSineSquared(LESS_theta, LESS_l, LESS_P): # Locally Periodic Kernel
 
 i=0;j=0 #Se não definir nenhum valor inicial dá erro no calculo da likelihood
 def WhiteNoise(WN_theta): # White Noise Kernel
-    return (WN_theta**2)*kd(i,j)*(x1-x2)
+    return (WN_theta**2)*kd(i,j)#*(x1-x2)
 
 ###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
 ## Linear Kernel
