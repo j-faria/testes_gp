@@ -48,17 +48,23 @@ print 'Took %f seconds' % (time() - start), ('log_p_george',log_p_george)
 
 #### CALCULO  DA LIKELIHOOD ################################################### 
 #definir kernel a usar
-kernel = ExpSquared 
+#kernel = ExpSquared + ExpSineSquared
 ES_theta = 1
 ES_l = 1
 x1=x
 x2=x
 
+ESS_theta = 2
+ESS_l = 2
+ESS_P = 5 
+
 #calcular matrix de covariancia K
 K=np.zeros((len(x),len(x)))
 for i in range(len(x)):
     for j in range(len(x)):
-        K[i,j]=kernel(x1[i],x2[j],ES_theta,ES_l)
+        #K[i,j]=kernel(x1[i],x2[j],ES_theta,ES_l)
+        K[i,j]=ExpSquared(x1[i],x2[j],ES_theta,ES_l)  \
+        + ExpSineSquared(x1[i],x2[j],ESS_theta,ESS_l,ESS_P)
 K=K+yerr**2*np.identity(len(x))      
 
 
