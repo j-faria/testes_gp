@@ -7,9 +7,11 @@ Created on Mon Sep 19 10:56:24 2016
 
 from likelihood import *
 
+#####  DADOS INICIAS  #########################################################
 x = 10 * np.sort(np.random.rand(2000))
 yerr = 0.2 * np.ones_like(x)
 y = np.sin(x) + yerr * np.random.randn(len(x))
+###############################################################################
 
 x1=x
 x2=x
@@ -20,11 +22,9 @@ l1 = 1
 theta2= 10
 l2=1
 P2=5
+#   Os parametros foram dados às três pancadas só mesmo para ver se o python faz
+#os calculos sem dar erro, por isso a likelihood deverá dar valores estranhos.
 
-#a=ExpSineSquared(x1,x2,10,1,5)
-#
-#def argumentcount(x): #conta as variaveis de x
-#    return x.__code__.co_argcount
 
 #likelihood(kernels, x dado, x a calcular, y, yerr)
 likelihood(ExpSquared(theta1,l1), x, x, y, yerr)
