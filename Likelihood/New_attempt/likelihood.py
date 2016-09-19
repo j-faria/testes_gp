@@ -5,6 +5,7 @@ Created on Mon Sep 19 10:51:12 2016
 @author: camacho
 """
 import numpy as np
+#import scipy  as sp
 from Kernel import *
 from time import time
 
@@ -32,20 +33,18 @@ def likelihood(kernel,x,xcalc,y,yerr):
             K[i,j]=kernel
     K=K+yerr**2*np.identity(len(x))      
     
-    
     #### COMEÇA A MINHA VERSAO
     start = time()
     #para usar cholesky a matriz tem de ser positiva definida
+    #L=sp.linalg.lu(K)
     L = np.linalg.cholesky(K)
     L_inv= np.linalg.inv(L)
     
     y = np.array(y)
-    
     #Calculo da log likelihood
     n=len(x)
     log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
         - n*0.5*np.log(2*np.pi)            
-    
     print 'Took %f seconds' % (time() - start), ('log_p',log_p)
     
     #### COMEÇA A VERSAO CORRIGIDA
