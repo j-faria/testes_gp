@@ -25,10 +25,6 @@ def lnlike(K, r):
 def likelihood(kernel,x,xcalc,y,yerr):
     #calcular matrix de covariancia K
     K=np.zeros((len(x),len(x)))
-    #x=np.array(x,dtype=np.float64)
-    #x2=np.array(x2,dtype=np.float64)
-    x
-    xcalc
     for i in range(len(x)):
         for j in range(len(xcalc)):
             x1=x[i]
