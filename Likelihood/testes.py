@@ -17,25 +17,30 @@ class Combinable:
         return self.f(args)
 
     def __add__(self, g):
-        return Combined(self.f, g) 
+        return Sum(self.f,g)    
+        
+    def __mul__(self, g):
+        return Mul(self.f, g)
 
-class Combined(Combinable):
+class Sum(Combinable): # funciona
     def __init__(self, f, g):
         self.f = f
         self.g = g
-
-#    def argumentcount(self): #conta as variaveis de x
-#        return self.__code__.co_argcount   
-#    def addargument(self,i):
-#        return args[i]
     
     def __call__(self, *args):
         #arranjar maneira de adicionar args[i]  consoante o valor de i
-        return self.f(args[0],args[1]) + self.g(args[2],args[3],args[4])    # funciona
-        print(countf)
+        return self.f(args[0],args[1]) + self.g(args[2],args[3],args[4])
+        #return self.f + self.g
+
+class Mul(Combinable): # nao funciona
+    def __init__(self, f, g):
+        self.f = f
+        self.g = g
+    
+    def __call__(self, *args):
+        return self.f(args[0],args[1]) * self.g(args[2],args[3],args[4])
 
 
-#@Combinable
 def a(x,y):
     return float(x)**2 + x + y
 
@@ -45,22 +50,11 @@ def b(x,y,z):
 def c(z):
     return z
 
-d=Combined(a,b)
+d=Sum(a,b)
 print(d(1,2,3,4,1))  #funciona
-#e=Combined(d,c)
-#print(e(1,2,1)) #nao funciona
 
-#def argumentcount(x): #conta as variaveis de x
-#    return x.__code__.co_argcount
-#run=argumentcount(a)
-#
-#xx=()
-#for i  in range(run):
-#    xx=xx+('args[%i]' %i,)
-#
-
-
-
+e=Mul(a,b)
+print(d(1,2,3,4,1))
 
 
 ###############################################################################
