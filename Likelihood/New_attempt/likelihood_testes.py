@@ -37,4 +37,4 @@ likelihood(Local_ExpSineSquared(10,1,5), x,  x, y ,yerr)
 
 print('-> multiplication and sum of kernels')
 #multiplicar com white noise incluido
-likelihood(ExpSquared(theta1,l1)*ExpSineSquared(theta2,l2,P2) +WhiteNoise(2), x, x, y, yerr)
+likelihood(ExpSquared(10,1)*ExpSineSquared(1,1,5) +WhiteNoise(2), x, x, y, yerr)
