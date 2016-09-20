@@ -6,7 +6,7 @@ Created on Mon Sep 19 10:56:24 2016
 """
 
 import Kernel as kl
-import likelihood as lh
+
 
 #####  DADOS INICIAS  #########################################################
 x = 10 * np.sort(np.random.rand(20))
@@ -22,7 +22,7 @@ y = np.sin(x) + yerr * np.random.randn(len(x))
 #kernel sozinha
 #print('-> lonely kernel')
 #lh.likelihood(x, x, y, yerr, par2,par1)
-lh.likelihood(kl.ExpSquared(19,2),x,x,y,yerr)
+kl.likelihood(kl.ExpSquared(19,2),x,x,y,yerr)
 
 #print('-> sum of kernels')
 ##somar
