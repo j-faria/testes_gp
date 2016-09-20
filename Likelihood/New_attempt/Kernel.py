@@ -31,12 +31,13 @@ def likelihood(kernel,x,xcalc,y,yerr):
     global x1,x2
     #calcular matrix de covariancia K
     K=np.zeros((len(x),len(x)))
+    #print(K)
     for i in range(len(x)):
         x1=x[i]
         for j in range(len(xcalc)):            
 #            x1=x[i]            
             x2=xcalc[j]
-            K[i,j]=kernel
+            K[i,j]+=kernel
             print(x1,x2,K[i,j])
 
     K=K+yerr**2*np.identity(len(x))      
@@ -126,4 +127,9 @@ def Local_ExpSineSquared(LESS_theta, LESS_l, LESS_P): # Locally Periodic Kernel
 #    f3 = (x1-x2)
 #    return f1*np.exp(-2*(np.sin(np.pi*f3/ESS_P))**2/f2)
 
-likelihood(ExpSquared(19,2), x, x, y, yerr)
+likelihood(kl.ExpSquared(19,2),x,x,y,yerr)
+
+if __name__ == "__main__":
+    print("Being run directly")
+else:
+    print("Being imported into another module")
