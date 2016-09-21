@@ -21,11 +21,11 @@ y = np.sin(x) + yerr * np.random.randn(len(x))
 
 #kernel sozinha
 print('-> lonely kernel')
-kl.likelihood(x,x,y,yerr,kl.ExpSquared,19,2)
+kl.likelihood(kl.ExpSquared(19, 2), x, x, y, yerr)
 
 #somar
 print('-> sum of kernels')
-likelihood(x, x, y, yerr,ExpSquared+ExpSineSquared,10,1,1,1,5)
+#kl.likelihood(kl.ExpSquared(10,1)+kl.ExpSineSquared(1,1,5), x, x, y, yerr)
 
 ##multiplicar
 #print('-> multiplication of kernels')
