@@ -5,8 +5,13 @@ Created on Mon Sep 19 10:56:24 2016
 @author: camacho
 """
 import numpy as np
-import Kernel as kl
+import Kernel
+reload(Kernel)
+kl = Kernel
+from time import time
 
+import george
+from george.kernels import *
 
 #####  DADOS INICIAS  #########################################################
 x = 10 * np.sort(np.random.rand(20))
@@ -23,8 +28,6 @@ y = np.sin(x) + yerr * np.random.randn(len(x))
 print('-> lonely kernel')
 kl.likelihood(kl.ExpSquared(19, 2), x, x, y, yerr)
 # Calculo usando o george 
-import george
-from george.kernels import ExpSquaredKernel
 start = time()
 kernel = 19**2*ExpSquaredKernel(2.0**2)
 gp = george.GP(kernel)
@@ -33,8 +36,15 @@ print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 
 #somar
 print('-> sum of kernels')
-a=kl.Sum_Kernel(kl.ExpSquared(10,1)+kl.ExpSineSquared(1,1,5))
-kl.likelihood(a, x, x, y, yerr)
+k = kl.ExpSquared(1.,1.) + kl.ExpSineSquared(1.,1.,1.)
+covK = kl.likelihood(k, x, x, y, yerr)
+# Calculo usando o george 
+start = time()
+kernel = ExpSquaredKernel(1.) + ExpSine2Kernel(1., 1.)
+gp = george.GP(kernel)
+gp.compute(x,yerr)
+print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
+
 
 #multiplicar
 print('-> multiplication of kernels')
