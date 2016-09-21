@@ -9,9 +9,9 @@ import numpy as np
 from time import time   
 
 #####  DADOS INICIAS  #########################################################
-x = 10 * np.sort(np.random.rand(2000))
-yerr = 0.2 * np.ones_like(x)
-y = np.sin(x) + yerr * np.random.randn(len(x))
+#x = 10 * np.sort(np.random.rand(2000))
+#yerr = 0.2 * np.ones_like(x)
+#y = np.sin(x) + yerr * np.random.randn(len(x))
 
 
 ###############################################################################
@@ -81,7 +81,6 @@ def RatQuadratic(x1, x2, *params): # Rational Quadratic Kernel
     f3 = (x1-x2)**2
     return f1*(1+(0.5*f3/(RQ_alpha*f2)))**(-RQ_alpha)
 
-
 def Local_ExpSineSquared(x1, x2, *params):             #Locally Periodic Kernel
     LESS_theta, LESS_l, LESS_P = params                       #identico a fazer
     f1 = LESS_theta**2                               #ExpSineSquared*ExpSquared
@@ -119,16 +118,16 @@ def Local_ExpSineSquared(x1, x2, *params):             #Locally Periodic Kernel
 #    f3 = (x1-x2)
 #    return f1*np.exp(-2*(np.sin(np.pi*f3/ESS_P))**2/f2)
 
-likelihood(x, x , y , yerr, ExpSquared, 1, 1)
+
 ########## CALCULO USANDO O GEOREGE ##########
-import george
-from george.kernels import ExpSquaredKernel
-start = time()
-kernel = ExpSquaredKernel(1.0)
-gp = george.GP(kernel)
-gp.compute(x,yerr)
-print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
+#import george
+#from george.kernels import ExpSquaredKernel
+#start = time()
+#kernel = ExpSquaredKernel(1.0)
+#gp = george.GP(kernel)
+#gp.compute(x,yerr)
+#print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 
 
-
+#likelihood(x, x , y , yerr, ExpSquared, 1, 1)
 #likelihood(x, x, y, yerr, ExpSineSquared, 19, 2 ,5)
