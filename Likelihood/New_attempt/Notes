@@ -5,3 +5,7 @@
 - Somar ou multiplicar kernels ainda não consegui, as classes que tentei criar para o fazer tambem estão no file "Kernel.py"
 
 - No ficheiro "lihelihood_testes.py" é onde faço os testes a ver se os calculos estão certos e comparo-os com os do george.
+
+- No ficheiro "testes.py" está outra tentativa de somar kernels, desta vez as kernel são funçoes em vez de classes, tambem nao funciona.
+
+- O ficheiro "Likelihood_MaunaLoa.py" é apenas usado outros dados para além dos  que está no ficheiro "lihelihood_testes.py". Não é importante até ser conseguido somar e multiplicar kernels e mais vale ignorar por enquanto.
