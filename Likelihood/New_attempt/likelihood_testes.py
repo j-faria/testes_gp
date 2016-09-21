@@ -4,7 +4,7 @@ Created on Mon Sep 19 10:56:24 2016
 
 @author: camacho
 """
-
+import numpy as np
 import Kernel as kl
 
 
@@ -20,16 +20,15 @@ y = np.sin(x) + yerr * np.random.randn(len(x))
 #os calculos sem dar erro, por isso a likelihood deverá dar valores estranhos.
 
 #kernel sozinha
-#print('-> lonely kernel')
-#lh.likelihood(x, x, y, yerr, par2,par1)
-kl.likelihood(kl.ExpSquared(19,2),x,x,y,yerr)
+print('-> lonely kernel')
+kl.likelihood(x,x,y,yerr,kl.ExpSquared,19,2)
 
-#print('-> sum of kernels')
-##somar
-#likelihood(ExpSquared(10,1)+ExpSineSquared(1,1,5), x, x, y, yerr)
-#
-#print('-> multiplication of kernels')
+#somar
+print('-> sum of kernels')
+likelihood(x, x, y, yerr,ExpSquared+ExpSineSquared,10,1,1,1,5)
+
 ##multiplicar
+#print('-> multiplication of kernels')
 #likelihood(ExpSquared(10,1)*ExpSineSquared(1,1,5), x, x, y, yerr)
 #likelihood(Local_ExpSineSquared(10,1,5), x,  x, y ,yerr)
 ##   A Local_ExpSineSquared = ExpSquared * ExpSineSquared, logo se a
