@@ -8,12 +8,7 @@ import numpy as np
 #from sympy import KroneckerDelta as kd
 from time import time   
 
-#####  DADOS INICIAS para exemplo #############################################
-#x = 10 * np.sort(np.random.rand(20))
-#yerr = 0.2 * np.ones_like(x)
-#y = np.sin(x) + yerr * np.random.randn(len(x))
-###############################################################################
- 
+##### KERNELS 
 class Kernel:
     def __call__(self, x1, x2):
         raise NotImplementedError
@@ -69,6 +64,7 @@ class Local_ExpSineSquared(Kernel):
         f5 = self.LESS_P
         return f1*np.exp(-2*(np.sin(np.pi*f3/f5))**2/f2)*np.exp(-0.5*f4/f2)        
 
+##### LIKELIHOOD
 def lnlike(K, r):
     from scipy.linalg import cho_factor, cho_solve
     L1 = cho_factor(K)  # tuple (L, lower)
@@ -110,6 +106,39 @@ def likelihood(kernel, x, xcalc, y, yerr):
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
 
 
+##### SUM and MULTIPLICATION
+class Combinable:
+    def __init__(self, f):
+        self.f = f
+
+    def __call__(self, *args):
+        return self.f(args)
+
+    def __add__(self, g):
+        return Sum_Ker(self.f,g)    
+        
+    def __mul__(self, g):
+        return Mul_Ker(self.f, g)
+
+class Sum_Kernel(Combinable): # naofunciona
+    def __init__(self, f, g):
+        self.f = f
+        self.g = g
+    
+    def __call__(self, *args):
+        #arranjar maneira de adicionar args[i]  consoante o valor de i
+        return self.f(args[0],args[1]) + self.g(args[2],args[3],args[4])
+        
+class Mul_Kernel(Combinable): # nao funciona
+    def __init__(self, f, g):
+        self.f = f
+        self.g = g
+    
+    def __call__(self, *args):
+        return self.f(args[0],args[1]) * self.g(args[2],args[3],args[4])
+
+###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
+
 ###### TESTES #####
 #likelihood(ExpSquared(19, 2), x, x, y, yerr)
 ## Calculo usando o george 
@@ -127,9 +156,7 @@ def likelihood(kernel, x, xcalc, y, yerr):
 ##### CONCLUSOES
 #A minha versão demora cerca de 8 vezes mais
 
-
-###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
-##### Kernels  criadas #########################################################
+##### Kernels  criadas ########################################################
 #def ExpSquared(x1, x2, *params): # Squared Exponential Kernel   
 #    ES_theta, ES_l = params    
 #    f1 = ES_theta**2
