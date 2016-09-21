@@ -8,10 +8,10 @@ import numpy as np
 #from sympy import KroneckerDelta as kd
 from time import time   
 
-#####  DADOS INICIAS  #########################################################
-x = 10 * np.sort(np.random.rand(20))
-yerr = 0.2 * np.ones_like(x)
-y = np.sin(x) + yerr * np.random.randn(len(x))
+#####  DADOS INICIAS para exemplo #############################################
+#x = 10 * np.sort(np.random.rand(20))
+#yerr = 0.2 * np.ones_like(x)
+#y = np.sin(x) + yerr * np.random.randn(len(x))
 ###############################################################################
  
 class Kernel:
