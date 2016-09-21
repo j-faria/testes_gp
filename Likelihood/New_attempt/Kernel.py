@@ -9,12 +9,50 @@ import numpy as np
 from time import time   
 
 ##### KERNELS 
-class Kernel:
+class Kernel(object):
+    def __init__(self, *args):
+        # put all Kernel arguments in an array pars
+        self.pars = np.array(args)
+
     def __call__(self, x1, x2):
         raise NotImplementedError
 
+    def __add__(self, b):
+        return Sum(self, b)
+    def __radd__(self, b):
+        return self.__add__(b)
+
+    def __repr__(self):
+        """ Representation of each Kernel instance """
+        return "{0}({1})".format(self.__class__.__name__,
+                                 ", ".join(map(str, self.pars)))
+
+class _operator(Kernel):
+    def __init__(self, k1, k2):
+        self.k1 = k1
+        self.k2 = k2
+
+    @property
+    def pars(self):
+        return np.append(self.k1.pars, self.k2.pars)
+
+    def __call__(self, x1, x2):
+        return self.k1(x1, x2) + self.k2(x1, x2)
+
+class Sum(_operator):
+    def __repr__(self):
+        return "{0} + {1}".format(self.k1, self.k2)
+
+
+
+
+
 class ExpSquared(Kernel):
     def __init__(self, ES_theta, ES_l):
+        # because we are "overwriting" the function __init__
+        # we use this weird super function
+        super(ExpSquared, self).__init__(ES_theta, ES_l)
+
         self.ES_theta = ES_theta
         self.ES_l = ES_l
 
@@ -26,6 +64,8 @@ class ExpSquared(Kernel):
 
 class ExpSineSquared(Kernel):
     def __init__(self, ESS_theta, ESS_l, ESS_P):
+        super(ExpSineSquared, self).__init__(ESS_theta, ESS_l, ESS_P)
+
         self.ESS_theta = ESS_theta
         self.ESS_l = ESS_l
         self.ESS_P = ESS_P
@@ -37,6 +77,7 @@ class ExpSineSquared(Kernel):
         f4 = self.ESS_P
         return f1*np.exp(-2*(np.sin(np.pi*f3/f4))**2/f2)     
  
+
 class RatQUadratic(Kernel):
     def __init__(self, RQ_theta, RQ_l, RQ_alpha):
         self.RQ_theta = RQ_theta
@@ -105,6 +146,8 @@ def likelihood(kernel, x, xcalc, y, yerr):
     log_p_correct = lnlike(K, y)
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
 
+    return K
+    
 
 ##### SUM and MULTIPLICATION
 class Combinable:
