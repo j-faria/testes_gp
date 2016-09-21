@@ -1,14 +1,18 @@
 - Juntei as kernels e o calculo da likelihood num ficheiro só com o nome de "Kernel" 
 depois quando usado num scrip é só fazer "import Kernel as kl"  ou algo do genero.
 
-- Converti as kernels todas em classes e creio que agora os calculos já funcionam todos sem erros.
+- Converti as kernels todas em classes e creio que agora os calculos já funcionam 
+todos sem erros.
 
-- Somar ou multiplicar kernels ainda não consegui, as classes que tentei criar para o fazer tambem estão no file "Kernel.py"
+- Somar ou multiplicar kernels ainda não consegui, as classes que tentei criar para 
+o fazer tambem estão no file "Kernel.py"
 
-- No ficheiro "lihelihood_testes.py" é onde faço os testes a ver se os calculos estão certos e comparo-os com os do george.
+- No ficheiro "lihelihood_testes.py" é onde faço os testes a ver se os calculos estão 
+certos e comparo-os com os do george.
 
-- No ficheiro "testes.py" está outra tentativa de somar kernels, desta vez as kernel são funçoes em vez de classes, 
-tambem nao funciona.
+- No ficheiro "testes.py" está outra tentativa de somar kernels, desta vez as kernel 
+são funçoes em vez de classes, tambem nao funciona.
 
-- O ficheiro "Likelihood_MaunaLoa.py" é apenas usado outros dados para além dos  que está no ficheiro "lihelihood_testes.py". 
-Não é importante até ser conseguido somar e multiplicar kernels e mais vale ignorar por enquanto.
+- O ficheiro "Likelihood_MaunaLoa.py" é apenas usado outros dados para além dos que 
+está no ficheiro "lihelihood_testes.py". Não é importante até ser conseguido somar e 
+multiplicar kernels e mais vale ignorar por enquanto.
