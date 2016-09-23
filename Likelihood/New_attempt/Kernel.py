@@ -5,7 +5,7 @@ Created on Wed Sep  7 10:42:48 2016
 @author: camacho
 """
 import numpy as np
-#from sympy import KroneckerDelta as kd
+from sympy import KroneckerDelta as kd
 from time import time   
 
 ##### KERNELS 
@@ -14,13 +14,18 @@ class Kernel(object):
         # put all Kernel arguments in an array pars
         self.pars = np.array(args)
 
-    def __call__(self, x1, x2):
+    def __call__(self, x1, x2, i, j):
         raise NotImplementedError
 
     def __add__(self, b):
         return Sum(self, b)
     def __radd__(self, b):
         return self.__add__(b)
+
+    def __mul__(self, b):
+        return Product(self, b)
+    def __rmul__(self, b):
+        return self.__mul__(b)
 
     def __repr__(self):
         """ Representation of each Kernel instance """
@@ -36,15 +41,22 @@ class _operator(Kernel):
     def pars(self):
         return np.append(self.k1.pars, self.k2.pars)
 
-    def __call__(self, x1, x2):
-        return self.k1(x1, x2) + self.k2(x1, x2)
+#    def __call__(self, x1, x2):
+#        return self.k1(x1, x2) + self.k2(x1, x2)
 
-class Sum(_operator):
+class Sum(_operator): #sum of kernels
     def __repr__(self):
         return "{0} + {1}".format(self.k1, self.k2)
 
+    def __call__(self, x1, x2, i, j):
+        return self.k1(x1, x2, i, j) + self.k2(x1, x2, i, j)
 
-
+class Product(_operator): #multiplication of kernels
+    def __repr__(self):
+        return "{0} * {1}".format(self.k1, self.k2)
+        
+    def __call__(self, x1, x2, i, j):
+        return self.k1(x1, x2, i, j) * self.k2(x1, x2, i, j)
 
 
 class ExpSquared(Kernel):
@@ -56,7 +68,7 @@ class ExpSquared(Kernel):
         self.ES_theta = ES_theta
         self.ES_l = ES_l
 
-    def __call__(self, x1, x2):
+    def __call__(self, x1, x2, i, j):
         f1 = self.ES_theta**2
         f2 = self.ES_l**2
         f3 = (x1 - x2)**2
@@ -70,34 +82,35 @@ class ExpSineSquared(Kernel):
         self.ESS_l = ESS_l
         self.ESS_P = ESS_P
     
-    def __call__(self, x1, x2):
+    def __call__(self, x1, x2, i, j):
         f1 = self.ESS_theta**2
         f2 = self.ESS_l**2
         f3 = (x1-x2)
         f4 = self.ESS_P
         return f1*np.exp(-2*(np.sin(np.pi*f3/f4))**2/f2)     
- 
 
-class RatQUadratic(Kernel):
+class RatQuadratic(Kernel):
     def __init__(self, RQ_theta, RQ_l, RQ_alpha):
+        super(RatQuadratic, self).__init__(RQ_theta, RQ_l, RQ_alpha)
         self.RQ_theta = RQ_theta
         self.RQ_l = RQ_l
         self.RQ_alpha = RQ_alpha
     
-    def __call__(self, x1, x2):
+    def __call__(self, x1, x2, i, j):
         f1 = self.RQ_theta**2
         f2 = self.RQ_l**2
         f3 = (x1-x2)**2
         f4 = self.RQ_alpha
         return f1*(1+(0.5*f3/(f4*f2)))**(-f4)
         
-class Local_ExpSineSquared(Kernel):
+class Local_ExpSineSquared(Kernel): #equal to ExpSquared*ExpSineSquared
     def __init__(self, LESS_theta, LESS_l, LESS_P):
+        super(Local_ExpSineSquared, self).__init__(LESS_theta, LESS_l, LESS_P)
         self.LESS_theta = LESS_theta
         self.LESS_l = LESS_l
         self.LESS_P = LESS_P
         
-    def __call__(self, x1 ,x2):
+    def __call__(self, x1 ,x2 , i,  j):
         f1 = self.LESS_theta**2                               
         f2 = self.LESS_l**2
         f3 = (x1-x2)
@@ -105,8 +118,21 @@ class Local_ExpSineSquared(Kernel):
         f5 = self.LESS_P
         return f1*np.exp(-2*(np.sin(np.pi*f3/f5))**2/f2)*np.exp(-0.5*f4/f2)        
 
+class WhiteNoise(Kernel):
+    def __init__(self,WN_theta):
+        super(WhiteNoise,self).__init__(WN_theta)
+        self.WN_theta=WN_theta
+    
+    def __call__(self, x1, x2, i, j):
+        f1=self.WN_theta**2
+        #f2=(x1-x2)     
+        f3=kd(i,j)
+        return f1*f3
+# In case the white noise is prove to be wrong, it will be necessary
+#to remove i and j from all  classes __call__
+
 ##### LIKELIHOOD
-def lnlike(K, r):
+def lnlike(K, r): #log-likelihood calculations
     from scipy.linalg import cho_factor, cho_solve
     L1 = cho_factor(K)  # tuple (L, lower)
     # this is K^-1*(r)
@@ -117,70 +143,68 @@ def lnlike(K, r):
               - n*0.5*np.log(2*np.pi)
     return logLike
 
-def likelihood(kernel, x, xcalc, y, yerr):
-    #covariance matrix K
-    K = np.zeros((len(x),len(x)))
+def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
+    K = np.zeros((len(x),len(x))) #covariance matrix K
     for i in range(len(x)):
         x1 = x[i]
+        i=i
         for j in range(len(xcalc)):                      
             x2 = xcalc[j]
-            K[i,j] = kernel(x1, x2)#, *params)
+            j=j
+            K[i,j] = kernel(x1, x2, i, j)#, *params)
             #print(x1,x2,K[i,j])
     K=K+yerr**2*np.identity(len(x))      
-    
-    #### COMEÇA A MINHA VERSAO
-    start = time()
-    #para usar cholesky a matriz tem de ser positiva definida
-    #L=sp.linalg.lu(K)
-    L = np.linalg.cholesky(K)
-    L_inv= np.linalg.inv(L)
-    y = np.array(y)
-    #Calculo da log likelihood
-    n=len(x)
-    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
-        - n*0.5*np.log(2*np.pi)            
-    print 'Took %f seconds' % (time() - start), ('log_p',log_p)
-    
-    #### COMEÇA A VERSAO CORRIGIDA
-    start = time()
+ 
+    start = time() #Corrected and faster version
     log_p_correct = lnlike(K, y)
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
-
     return K
+    assert np.allclose(log_p_correct)
+#    start = time() #Original and slower version
+#    #para usar cholesky a matriz tem de ser positiva definida
+#    #L=sp.linalg.lu(K)
+#    L = np.linalg.cholesky(K)
+#    L_inv= np.linalg.inv(L)
+#    y = np.array(y)
+#    #Calculo da log likelihood
+#    n=len(x)
+#    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
+#        - n*0.5*np.log(2*np.pi)            
+#    print 'Took %f seconds' % (time() - start), ('log_p',log_p)
     
 
-##### SUM and MULTIPLICATION
-class Combinable:
-    def __init__(self, f):
-        self.f = f
-
-    def __call__(self, *args):
-        return self.f(args)
-
-    def __add__(self, g):
-        return Sum_Ker(self.f,g)    
-        
-    def __mul__(self, g):
-        return Mul_Ker(self.f, g)
-
-class Sum_Kernel(Combinable): # naofunciona
-    def __init__(self, f, g):
-        self.f = f
-        self.g = g
     
-    def __call__(self, *args):
-        #arranjar maneira de adicionar args[i]  consoante o valor de i
-        return self.f(args[0],args[1]) + self.g(args[2],args[3],args[4])
-        
-class Mul_Kernel(Combinable): # nao funciona
-    def __init__(self, f, g):
-        self.f = f
-        self.g = g
-    
-    def __call__(self, *args):
-        return self.f(args[0],args[1]) * self.g(args[2],args[3],args[4])
-
 ###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
+###### SUM and MULTIPLICATION #####
+#class Combinable:
+#    def __init__(self, f):
+#        self.f = f
+#
+#    def __call__(self, *args):
+#        return self.f(args)
+#
+#    def __add__(self, g):
+#        return Sum_Ker(self.f,g)    
+#        
+#    def __mul__(self, g):
+#        return Mul_Ker(self.f, g)
+#
+#class Sum_Kernel(Combinable): # naofunciona
+#    def __init__(self, f, g):
+#        self.f = f
+#        self.g = g
+#    
+#    def __call__(self, *args):
+#        #arranjar maneira de adicionar args[i]  consoante o valor de i
+#        return self.f(args[0],args[1]) + self.g(args[2],args[3],args[4])
+#        
+#class Mul_Kernel(Combinable): # nao funciona
+#    def __init__(self, f, g):
+#        self.f = f
+#        self.g = g
+#    
+#    def __call__(self, *args):
+#        return self.f(args[0],args[1]) * self.g(args[2],args[3],args[4])
 
 ###### TESTES #####
 #likelihood(ExpSquared(19, 2), x, x, y, yerr)
