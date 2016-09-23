@@ -14,7 +14,7 @@ import george
 from george.kernels import *
 
 #####  DADOS INICIAS  #########################################################
-x = 10 * np.sort(np.random.rand(20))
+x = 10 * np.sort(np.random.rand(100))
 yerr = 0.2 * np.ones_like(x)
 y = np.sin(x) + yerr * np.random.randn(len(x))
 
@@ -24,37 +24,54 @@ y = np.sin(x) + yerr * np.random.randn(len(x))
 #   Os parametros foram dados às três pancadas só mesmo para ver se o python faz
 #os calculos sem dar erro, por isso a likelihood deverá dar valores estranhos.
 
-#kernel sozinha
+#Lone kernel
 print('-> lonely kernel')
-kl.likelihood(kl.ExpSquared(19, 2), x, x, y, yerr)
-# Calculo usando o george 
-start = time()
+kl.likelihood(kl.ExpSquared(19.0, 2.0), x, x, y, yerr)
+
+start = time() # Calculation using george 
 kernel = 19**2*ExpSquaredKernel(2.0**2)
 gp = george.GP(kernel)
 gp.compute(x,yerr)
 print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 
-#somar
+
+#Sum of kernels
 print('-> sum of kernels')
-k = kl.ExpSquared(1.,1.) + kl.ExpSineSquared(1.,1.,1.)
-covK = kl.likelihood(k, x, x, y, yerr)
-# Calculo usando o george 
-start = time()
-kernel = ExpSquaredKernel(1.) + ExpSine2Kernel(1., 1.)
+k1 = kl.ExpSquared(1.0,1.0) + kl.ExpSineSquared(1.,1.,1.)
+k2 = kl.Sum(kl.ExpSquared(1.0,1.0),kl.ExpSineSquared(1.,1.,1.))
+covk1 = kl.likelihood(k1, x, x, y, yerr)
+covk2 = kl.likelihood(k2, x, x, y, yerr)
+
+start = time() # Calculation using george 
+kernel = 1.**2*ExpSquaredKernel(1.0**2) + ExpSine2Kernel(1., 1.)
 gp = george.GP(kernel)
 gp.compute(x,yerr)
 print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 
 
-#multiplicar
+#Multiplication  of kernels
 print('-> multiplication of kernels')
-a=kl.Sum_Kernel(kl.ExpSquared(10,1)*kl.ExpSineSquared(1,1,5))
+a=kl.ExpSquared(1.0,1.0)*kl.ExpSineSquared(1.0,1.0,1.0)
 kl.likelihood(a, x, x, y, yerr)
-kl.likelihood(kl.Local_ExpSineSquared(10,1,5), x, x, y, yerr)
+kl.likelihood(kl.Local_ExpSineSquared(1.0,1.0,1.0), x, x, y, yerr)
 #   A Local_ExpSineSquared = ExpSquared * ExpSineSquared, logo se a
-#multiplicação estiver a ser bem feita as duas devem dar os mesmos valores
+#multiplicação estiver a ser bem feita acho as duas devem dar os mesmos valores
+
+start = time() # Calculation using george 
+kernel = 1.**2*ExpSquaredKernel(1.0**2) * ExpSine2Kernel(1., 1.)
+gp = george.GP(kernel)
+gp.compute(x,yerr)
+print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 
 
-#print('-> multiplication and sum of kernels')
-##multiplicar com white noise incluido
-#likelihood(ExpSquared(10,1)*ExpSineSquared(1,1,5) +WhiteNoise(2), x, x, y, yerr)
+#Multiplication  and sum of kernels
+print('-> multiplication and sum of kernels')
+#multiplicar com white noise incluido
+b=kl.ExpSquared(1.0,1.0)*kl.ExpSineSquared(1.,1.,1.) +kl.WhiteNoise(1.)
+likelihood(b, x, x, y, yerr)
+
+start = time() # Calculation using george 
+kernel = 1.**2*ExpSquaredKernel(1.0**2) * ExpSine2Kernel(1., 1.) +  WhiteKernel(1.)
+gp = george.GP(kernel)
+gp.compute(x,yerr)
+print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
