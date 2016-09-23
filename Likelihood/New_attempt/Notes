@@ -1,3 +1,19 @@
+		23/09/2016
+
+- Multiplicação e soma parece "funcionar", devolve valores diferentes do george
+e é necessário ver o porquê ainda!
+
+- A multiplicação mesmo dando valores diferentes que no george acho que está bem,
+a kernel Local_ExpSineSquared = ExpSineSquared*ExpSquared logo esta kernel tem de
+devolver o mesmo valor que o obtido quando se multiplica ExpSineSquared*ExpSquared
+e isso é verificado.
+
+- Criada a kernel WhiteNoise tornando necessário alterar uns pequenos pormenores
+nas outras kernel, foi inserido variaveis "i" e "j" para o delta kronecker funcionar
+no WhiteNoise, acho que isso nao afecta o calculo das outras kernels.
+
+		21/09/2016
+
 - Juntei as kernels e o calculo da likelihood num ficheiro só com o nome de "Kernel" 
 depois quando usado num scrip é só fazer "import Kernel as kl"  ou algo do genero.
 
