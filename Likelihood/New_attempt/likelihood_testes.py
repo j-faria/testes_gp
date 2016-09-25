@@ -5,9 +5,7 @@ Created on Mon Sep 19 10:56:24 2016
 @author: camacho
 """
 import numpy as np
-import Kernel
-reload(Kernel)
-kl = Kernel
+import Kernel;reload(Kernel);kl = Kernel
 from time import time
 
 import george
@@ -68,7 +66,7 @@ print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 print('-> multiplication and sum of kernels')
 #multiplicar com white noise incluido
 b=kl.ExpSquared(1.0,1.0)*kl.ExpSineSquared(1.,1.,1.) +kl.WhiteNoise(1.)
-likelihood(b, x, x, y, yerr)
+kl.likelihood(b, x, x, y, yerr)
 
 start = time() # Calculation using george 
 kernel = 1.**2*ExpSquaredKernel(1.0**2) * ExpSine2Kernel(1., 1.) +  WhiteKernel(1.)
