@@ -36,9 +36,9 @@ print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
 #Sum of kernels
 print('-> sum of kernels')
 k1 = kl.ExpSquared(1.0,1.0) + kl.ExpSineSquared(1.,1.,1.)
-k2 = kl.Sum(kl.ExpSquared(1.0,1.0),kl.ExpSineSquared(1.,1.,1.))
+#k2 = kl.Sum(kl.ExpSquared(1.0,1.0),kl.ExpSineSquared(1.,1.,1.))
 covk1 = kl.likelihood(k1, x, x, y, yerr)
-covk2 = kl.likelihood(k2, x, x, y, yerr)
+#covk2 = kl.likelihood(k2, x, x, y, yerr)
 
 start = time() # Calculation using george 
 kernel = 1.**2*ExpSquaredKernel(1.0**2) + ExpSine2Kernel(1., 1.)
