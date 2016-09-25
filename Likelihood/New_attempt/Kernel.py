@@ -144,6 +144,7 @@ def lnlike(K, r): #log-likelihood calculations
     return logLike
 
 def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
+    start = time() #Corrected and faster version    
     K = np.zeros((len(x),len(x))) #covariance matrix K
     for i in range(len(x)):
         x1 = x[i]
@@ -155,7 +156,7 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
             #print(x1,x2,K[i,j])
     K=K+yerr**2*np.identity(len(x))      
  
-    start = time() #Corrected and faster version
+    #start = time() #Corrected and faster version
     log_p_correct = lnlike(K, y)
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
     return K
