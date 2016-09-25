@@ -1,3 +1,12 @@
+		25/10/2016
+
+- Quantas mais somas e multiplicações se usa no programa que escrevemos muito
+mais lento este se torna quando comparado com o george.
+
+- Ainda não consegui perceber porque é que obtemos valores iguais ao george
+quando se usa apenas uma kernel, mas quando se multiplica ou soma os valores
+alteram.
+
 		23/09/2016
 
 - Multiplicação e soma parece "funcionar", devolve valores diferentes do george
