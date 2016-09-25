@@ -128,7 +128,7 @@ class WhiteNoise(Kernel):
         #f2=(x1-x2)     
         f3=kd(i,j)
         return f1*f3
-# In case the white noise is prove to be wrong, it will be necessary
+# In case the white noise is proved to be wrong, it will be necessary
 #to remove i and j from all  classes __call__
 
 ##### LIKELIHOOD
@@ -155,12 +155,11 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
             K[i,j] = kernel(x1, x2, i, j)#, *params)
             #print(x1,x2,K[i,j])
     K=K+yerr**2*np.identity(len(x))      
- 
-    #start = time() #Corrected and faster version
     log_p_correct = lnlike(K, y)
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
     return K
-    assert np.allclose(log_p_correct)
+
+#    assert np.allclose(log_p_correct)
 #    start = time() #Original and slower version
 #    #para usar cholesky a matriz tem de ser positiva definida
 #    #L=sp.linalg.lu(K)
@@ -169,8 +168,9 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 #    y = np.array(y)
 #    #Calculo da log likelihood
 #    n=len(x)
-#    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) - sum(np.log(np.diag(L))) \
-#        - n*0.5*np.log(2*np.pi)            
+#    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) \
+#            - sum(np.log(np.diag(L))) \
+#            - n*0.5*np.log(2*np.pi)            
 #    print 'Took %f seconds' % (time() - start), ('log_p',log_p)
     
 
