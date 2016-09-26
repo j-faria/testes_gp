@@ -41,6 +41,9 @@ class _operator(Kernel):
     def pars(self):
         return np.append(self.k1.pars, self.k2.pars)
 
+#    def __call__(self, x1, x2):
+#        return self.k1(x1, x2) + self.k2(x1, x2)
+
 class Sum(_operator): #sum of kernels
     def __repr__(self):
         return "{0} + {1}".format(self.k1, self.k2)
@@ -122,7 +125,7 @@ class WhiteNoise(Kernel):
     
     def __call__(self, x1, x2, i, j):
         f1=self.WN_theta**2
-        f2=(x1-x2)     
+        #f2=(x1-x2)     
         f3=kd(i,j)
         return f1*f3
 # In case the white noise is proved to be wrong, it will be necessary
@@ -149,8 +152,7 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
         for j in range(len(xcalc)):                      
             x2 = xcalc[j]
             j=j
-            K[i,j] = kernel(x1, x2, i, j)#, *params)
-            #print(x1,x2,K[i,j])
+            K[i,j] = kernel(x1, x2, i, j)
     K=K+yerr**2*np.identity(len(x))      
     log_p_correct = lnlike(K, y)
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
