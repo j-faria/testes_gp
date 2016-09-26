@@ -13,9 +13,9 @@ import george
 from george.kernels import *
 
 #####  DADOS INICIAS  #########################################################
-#x = 10 * np.sort(np.random.rand(100))
-#yerr = 0.2 * np.ones_like(x)
-#y = np.sin(5*x) + yerr * np.random.randn(len(x))
+x = 10 * np.sort(np.random.rand(100))
+yerr = 0.2 * np.ones_like(x)
+y = np.sin(5*x) + yerr * np.random.randn(len(x))
 #pl.plot(x,y)
 
 ###############################################################################
@@ -51,13 +51,28 @@ from george.kernels import *
 #gp.compute(x2,yerr2)
 #print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y2))
 
+#### Sum of kernels #####
+print('-> sum of kernels')
+k1 = kl.ExpSquared(1.0,1.0) + kl.ExpSineSquared(1.,1.,1.)
+#k2 = kl.Sum(kl.ExpSquared(1.0,1.0),kl.ExpSineSquared(1.,1.,1.))
+covk1 = kl.likelihood(k1, x, x, y, yerr)
+#covk2 = kl.likelihood(k2, x, x, y, yerr)
+
+start = time() # Calculation using george 
+kernel = 1.**2*ExpSquaredKernel(1.0**2) + ExpSine2Kernel(1., 1.)
+gp = george.GP(kernel)
+gp.compute(x,yerr)
+print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
+
+
+##### Multiplication  of kernels #####
 #EXEMPLO 3 - Local_ExpSineSquared
 x3 = 10 * np.sort(np.random.rand(103))
 yerr3 = 0.2 * np.ones_like(x3)
 y3 = np.sin(5*x3) + yerr3 * np.random.randn(len(x3))
-pl.plot(x3,y3)
+#pl.plot(x3,y3)
 
-print('-> lonely kernel')
+print('-> multiplication of kernels')
 #kl.likelihood(kl.Local_ExpSineSquared(1.0, 2.0, 2.0), x3, x3, y3, yerr3)
 a=kl.ExpSquared(1.0,2.0)*kl.ExpSineSquared(1.0,2.0,2.0)*kl.WhiteNoise(1.0)
 kl.likelihood(a, x3,x3,y3,yerr3)
@@ -68,21 +83,6 @@ gp = george.GP(kernel)
 gp.compute(x3,yerr3)
 print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y3))
 
-##Sum of kernels
-#print('-> sum of kernels')
-#k1 = kl.ExpSquared(1.0,1.0) + kl.ExpSineSquared(1.,1.,1.)
-##k2 = kl.Sum(kl.ExpSquared(1.0,1.0),kl.ExpSineSquared(1.,1.,1.))
-#covk1 = kl.likelihood(k1, x, x, y, yerr)
-##covk2 = kl.likelihood(k2, x, x, y, yerr)
-#
-#start = time() # Calculation using george 
-#kernel = 1.**2*ExpSquaredKernel(1.0**2) + ExpSine2Kernel(1., 1.)
-#gp = george.GP(kernel)
-#gp.compute(x,yerr)
-#print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y))
-#
-#
-##Multiplication  of kernels
 #print('-> multiplication of kernels')
 #a=kl.ExpSquared(1.0,1.0)*kl.ExpSineSquared(1.0,1.0,1.0)
 #kl.likelihood(a, x, x, y, yerr)
