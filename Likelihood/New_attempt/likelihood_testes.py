@@ -39,6 +39,16 @@ gp = george.GP(kernel)
 gp.compute(x1,yerr1)
 print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y1))
 
+#EXEMPLO 1.5 - Matern 3/2
+kl.likelihood(kl.Matern_32(10.0,1000.0),x1,x1,y1,yerr1)
+start = time() # Calculation using george 
+kernell = 10.0**2*Matern32Kernel(1000.0**2)
+gp = george.GP(kernell)
+gp.compute(x1,yerr1)
+print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y1))
+
+
+
 #EXEMPLO 2 - ExpSineSquared
 x2 = 10 * np.sort(np.random.rand(102))
 yerr2 = 0.2 * np.ones_like(x2)
