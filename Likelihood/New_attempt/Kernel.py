@@ -130,7 +130,47 @@ class WhiteNoise(Kernel):
         return f1*f3
 # In case the white noise is proved to be wrong, it will be necessary
 #to remove i and j from all  classes __call__
+        
+class Exponential(Kernel): #Matern 1/2 = Exponential
+    def __init__(self,Exp_theta,Exp_l):
+        super(Exponential,self).__init__(Exp_theta,Exp_l)
+        self.Exp_theta=Exp_theta        
+        self.Exp_l=Exp_l
 
+        
+    def __call__(self, x1,  x2, i, j):
+        f1=x1-x2
+        f2=self.Exp_l
+        f3=self.Exp_theta**2
+        return f3*np.exp(-f1/f2)
+
+class Matern_32(Kernel): #Matern 3/2
+    def __init__(self,M32_theta,M32_l):
+        super(Matern_32,self).__init__(M32_theta,M32_l)
+        self.M32_theta=M32_theta   
+        self.M32_l=M32_l
+     
+        
+    def __call__(self, x1, x2, i, j):
+        f1=np.sqrt(3.0)*(x1-x2)
+        f2=self.M32_l
+        f3=self.M32_theta**2
+        return f3*(1.0 + f1/f2)*np.exp(-f1/f2)
+        
+class Matern_52(Kernel): #Matern 5/2
+    def __init__(self,M52_l):
+        super(Matern_52,self).__init__(M52_theta,M52_l)
+        self.M52_theta=M52_theta        
+        self.M52_l=M52_l
+
+    def __call__(self, x1, x2, i, j):
+        f1=np.sqrt(5.0)*(x1-x2)
+        f2=(x1-x2)**2        
+        f3=self.M52_l
+        f4=self.M52_l**2
+        f5=self.M52_theta**2
+        return f5*(1.0 + f1/f3 + (5.0*f4)/(3.0*f4))*np.exp(-f1/f3)
+        
 ##### LIKELIHOOD
 def lnlike(K, r): #log-likelihood calculations
     from scipy.linalg import cho_factor, cho_solve
