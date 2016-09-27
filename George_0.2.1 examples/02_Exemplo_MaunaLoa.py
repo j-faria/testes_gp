@@ -10,6 +10,7 @@ Created on Fri Sep  2 10:01:18 2016
 import numpy as np
 import statsmodels.api as sm
 import matplotlib.pyplot as pl
+import george
 
 pl.close("all") #fecha todas as figuras anteriores
 
@@ -42,7 +43,7 @@ kernel = k1 + k2 + k3 + k4
 gp = george.GP(kernel, mean=np.mean(y))
 gp.compute(t)
 print(gp.lnlikelihood(y))
-print(gp.grad_lnlikelihood(y))
+#print(gp.grad_lnlikelihood(y))
 
     #Compute the predicted values of the function at a fine grid of points 
 #conditioned on the observed data
