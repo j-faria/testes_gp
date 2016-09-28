@@ -58,31 +58,31 @@ print(d(1,2,3,4,1))
 
 
 ###############################################################################
-#def argumentcount(x): #conta as variaveis de x
-#    return x.__code__.co_argcount
+def argumentcount(x): #conta as variaveis de x
+    return x.__code__.co_argcount
 
-#for i in range(0, 10, 3):
-#    pref = "g%02i_" % (i/3)
-#print(pref)
+for i in range(0, 10, 3):
+    pref = "g%02i_" % (i/3)
+print(pref)
 
 ###############################################################################
-#def callback(fn):
-#    def inner(self, *args):
-#        return _do_callback(fn.__get__(self, type(self)), self.log, *args)
-#    return inner
-#
-#class Foo(object):
-#    def __init__(self):
-#        self.log = Log('Foo')
-#
-#@callback
-#def cb1_wrapped(self,x):
-#    pass
+def callback(fn):
+    def inner(self, *args):
+        return _do_callback(fn.__get__(self, type(self)), self.log, *args)
+    return inner
 
-#def wrap(bound_method):
-#    return lambda *args: _do_callback(bound_method, bound_method.__self__.log, args)
-#
-#dd=callback(d)
+class Foo(object):
+    def __init__(self):
+        self.log = Log('Foo')
+
+@callback
+def cb1_wrapped(self,x):
+    pass
+
+def wrap(bound_method):
+    return lambda *args: _do_callback(bound_method, bound_method.__self__.log, args)
+
+dd=callback(d)
 
 ######
 #def argumentcount(x): #conta as variaveis da função
