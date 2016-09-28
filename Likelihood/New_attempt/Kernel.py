@@ -7,7 +7,8 @@ Created on Wed Sep  7 10:42:48 2016
 import numpy as np
 from sympy import KroneckerDelta as kd
 from time import time   
-
+import inspect as i
+ 
 ##### KERNELS 
 class Kernel(object):
     def __init__(self, *args):
@@ -40,9 +41,6 @@ class _operator(Kernel):
     @property
     def pars(self):
         return np.append(self.k1.pars, self.k2.pars)
-
-#    def __call__(self, x1, x2):
-#        return self.k1(x1, x2) + self.k2(x1, x2)
 
 class Sum(_operator): #sum of kernels
     def __repr__(self):
@@ -137,7 +135,6 @@ class Exponential(Kernel): #Matern 1/2 = Exponential
         self.Exp_theta=Exp_theta        
         self.Exp_l=Exp_l
 
-        
     def __call__(self, x1,  x2, i, j):
         f1=x1-x2
         f2=self.Exp_l
@@ -148,8 +145,7 @@ class Matern_32(Kernel): #Matern 3/2
     def __init__(self,M32_theta,M32_l):
         super(Matern_32,self).__init__(M32_theta,M32_l)
         self.M32_theta=M32_theta   
-        self.M32_l=M32_l
-     
+        self.M32_l=M32_l  
         
     def __call__(self, x1, x2, i, j):
         f1=np.sqrt(3.0)*(x1-x2)
@@ -170,7 +166,8 @@ class Matern_52(Kernel): #Matern 5/2
         f4=self.M52_l**2
         f5=self.M52_theta**2
         return f5*(1.0 + f1/f3 + (5.0*f4)/(3.0*f4))*np.exp(-f1/f3)
-        
+
+     
 ##### LIKELIHOOD
 def lnlike(K, r): #log-likelihood calculations
     from scipy.linalg import cho_factor, cho_solve
@@ -198,7 +195,25 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
     print 'Took %f seconds' % (time() - start), ('log_p_correct',log_p_correct)    
     return K
 
-#    assert np.allclose(log_p_correct)
+
+##### LIKELIHOOD GRADIENT
+def variables(kernel):   #devolve as variaveis da kernel, a rever que bate mal
+    return [i for i in kernel.__dict__.keys() if i[:1] != '_']
+
+    
+###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
+    
+#def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
+#    start = time() #Corrected and faster version    
+#    K = np.zeros((len(x),len(x))) #covariance matrix K
+#    for i in range(len(x)):
+#        x1 = x[i]
+#        i=i
+#        for j in range(len(xcalc)):                      
+#            x2 = xcalc[j]
+#            j=j
+#            K[i,j] = kernel(x1, x2, i, j)
+#    K=K+yerr**2*np.identity(len(x))     
 #    start = time() #Original and slower version
 #    #para usar cholesky a matriz tem de ser positiva definida
 #    #L=sp.linalg.lu(K)
@@ -210,11 +225,8 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 #    log_p = -0.5*np.dot(np.dot(np.dot(y.T,L.T),L_inv),y) \
 #            - sum(np.log(np.diag(L))) \
 #            - n*0.5*np.log(2*np.pi)            
-#    print 'Took %f seconds' % (time() - start), ('log_p',log_p)
+#    print 'Took %f seconds' % (time() - start), ('log_p',log_p)    
     
-
-    
-###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
 ###### SUM and MULTIPLICATION #####
 #class Combinable:
 #    def __init__(self, f):
