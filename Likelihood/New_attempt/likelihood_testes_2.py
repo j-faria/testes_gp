@@ -20,7 +20,7 @@ yerr = 0.2 * np.ones_like(x)
 y = np.sin(5*x) + yerr * np.random.randn(len(x))
 
 ###############################################################################
-
+ker=kl.ExpSineSquared(1.0,1.0,1.0)
 ##### Lonely kernel #####
 #EXEMPLO 1 - ExpSquared
 x1 = 10 * np.sort(np.random.rand(101))
@@ -40,7 +40,7 @@ print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y1))
 print 'variaveis ->', kl.variables(kernel0)
 
 a=kl.variables(kernel0)
-
+grad_log_p(ExpSquared(19.0,2.0),x1,x1,y1,yerr1)
 ###### Sum of kernels #####
 ##EXEMPLO 2
 #print('-> sum of kernels')
