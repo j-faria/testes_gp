@@ -214,7 +214,9 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 
 ##### LIKELIHOOD GRADIENT
 def variables(kernel):   #devolve as variaveis da kernel, a rever que bate mal
-    return [i for i in kernel.__dict__.keys() if i[:1] != '_']
+    #return [i for i in kernel.__dict__.keys() if i[:1] != '_'] #devolve variaveis
+    #return [i for i in kernel.__dict__.values() if i[:1] != '_'] #devolve os valores
+    return [i for i in kernel.pars[:]]
 
 def gradient(K_grad,r):
     from scipy.linalg import cho_factor, cho_solve
@@ -237,7 +239,7 @@ def grad_log_p(kernel,x,xcalc,y,yerr):
                 K_grad[i,j] = kernel(x1, x2, i, j)
         K_grad=K_grad+yerr**2*np.identity(len(x)) 
         gradient_logp = gradient(K_grad,y)
-    print gradient_logp
+        return gradient_logp
     
     
     
