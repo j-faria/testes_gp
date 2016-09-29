@@ -40,7 +40,11 @@ print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y1))
 print 'variaveis ->', kl.variables(kernel0)
 
 a=kl.variables(kernel0)
-grad_log_p(ExpSquared(19.0,2.0),x1,x1,y1,yerr1)
+print grad_log_p(ExpSquared(19.0,2.0),x1,x1,y1,yerr1) #devolve None
+
+
+
+
 ###### Sum of kernels #####
 ##EXEMPLO 2
 #print('-> sum of kernels')
