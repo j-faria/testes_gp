@@ -62,7 +62,7 @@ class ExpSquared(Kernel):
         # because we are "overwriting" the function __init__
         # we use this weird super function
         super(ExpSquared, self).__init__(ES_theta, ES_l)
-
+        
         self.ES_theta = ES_theta
         self.ES_l = ES_l
 
@@ -71,7 +71,21 @@ class ExpSquared(Kernel):
         f2 = self.ES_l**2
         f3 = (x1 - x2)**2
         return f1 * np.exp(-0.5 * f3 / f2)
+        
+class ExpSquared_l(Kernel): #derivada em ordem a ES_l
+    def __init__(self, ES_theta, ES_l):
+        super(ExpSquared_l, self).__init__(ES_theta, ES_l)
 
+        self.ES_theta = ES_theta
+        self.ES_l = ES_l       
+
+    def __call__(self,x1,x2,i,j):
+        f1=ES_theta**2
+        f2=(x1-x2)**2
+        f3=ES_l**3
+        f4=ES_l**2
+        return f1* (f2/f3)*  np.exp(-0.5 * f2/f4)
+ 
 class ExpSineSquared(Kernel):
     def __init__(self, ESS_theta, ESS_l, ESS_P):
         super(ExpSineSquared, self).__init__(ESS_theta, ESS_l, ESS_P)
@@ -167,6 +181,8 @@ class Matern_52(Kernel): #Matern 5/2
         f5=self.M52_theta**2
         return f5*(1.0 + f1/f3 + (5.0*f4)/(3.0*f4))*np.exp(-f1/f3)
 
+
+
      
 ##### LIKELIHOOD
 def lnlike(K, r): #log-likelihood calculations
@@ -200,6 +216,35 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 def variables(kernel):   #devolve as variaveis da kernel, a rever que bate mal
     return [i for i in kernel.__dict__.keys() if i[:1] != '_']
 
+def gradient(K_grad,r):
+    from scipy.linalg import cho_factor, cho_solve
+    L1 = cho_factor(K_grad)  # tuple (L, lower)
+    # this is K^-1*(r)
+    sol = cho_solve(L1, r)
+    grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-np.linalg.inv(K)),K_grad))
+    return grad_likelihood
+    
+def grad_log_p(kernel,x,xcalc,y,yerr):
+    if kernel is ExpSquared:
+        kernel = ExpSquared_l(variables(kernel))
+        K_grad = np.zeros((len(x),len(x))) #covariance matrix K
+        for i in range(len(x)):
+            x1 = x[i]
+            i=i
+            for j in range(len(xcalc)):                      
+                x2 = xcalc[j]
+                j=j
+                K_grad[i,j] = kernel(x1, x2, i, j)
+        K_grad=K_grad+yerr**2*np.identity(len(x)) 
+        gradient_logp = gradient(K_grad,y)
+    print gradient_logp
+    
+    
+    
+    
+    
+    
+    
     
 ###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
     
