@@ -1,11 +1,18 @@
-		29/10/2016
+		30/09/2016
+
+- Adicionadas kernels das derivadas parcias de cada kernel
+original, ainda não tenho a certeza se vão ser uteis e  como
+fazer python relacionar tudo quando quiser  calcular o
+gradiente
+
+		29/09/2016
 
 - Tentado criar função capaz de calcular o gradiente do log
 likelihood mas ainda tem muitos erros até ser capaz de fazer
 um calculo correcto.
 
 
-		27/10/2016
+		27/09/2016
 
 - Criada três novas kernels, Exponential, Matern_32 e Matern_52,
 ainda não tenho a certeza se funcionam como deve ser.
@@ -14,7 +21,7 @@ ainda não tenho a certeza se funcionam como deve ser.
 log likelihood ao perceber que vai ser preciso derivar as kernels
 em ordem aos parametros destas.
 
-		26/10/2016
+		26/09/2016
 	
 - Problema com soma de kernels resolvido e agora tanto a soma como
 multiplicação parecem funcionar visto devolverem valores iguais ao
@@ -28,7 +35,7 @@ correctos.
 e tentar perceber se nos podem ser uteis, caso seja vou cria-las no 
 ficheiro Kernel.py
 
-		25/10/2016
+		25/09/2016
 
 - Quantas mais somas e multiplicações se usa no programa que escrevemos
 muito lento este se torna quando comparado com o george.
