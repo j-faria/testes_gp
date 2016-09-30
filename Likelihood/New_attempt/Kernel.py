@@ -71,19 +71,32 @@ class ExpSquared(Kernel):
         f2 = self.ES_l**2
         f3 = (x1 - x2)**2
         return f1 * np.exp(-0.5 * f3 / f2)
-        
-class ExpSquared_l(Kernel): #derivada em ordem a ES_l
+
+class dExpSquared_dtheta(Kernel): #derivadada em ordem a ES_theta
     def __init__(self, ES_theta, ES_l):
-        super(ExpSquared_l, self).__init__(ES_theta, ES_l)
+        super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
+        
+        self.ES_theta = ES_theta
+        self.ES_l = ES_l
+
+    def __call__(self,x1,x2,i,j):
+        f1=self.ES_theta *2            
+        f2=(x1-x2)**2
+        f3=self.ES_l**2
+        return  f1*np.exp(-0.5*f2/f3)        
+        
+class dExpSquared_dl(Kernel): #derivada em ordem a ES_l
+    def __init__(self, ES_theta, ES_l):
+        super(dExpSquared_dl, self).__init__(ES_theta, ES_l)
 
         self.ES_theta = ES_theta
         self.ES_l = ES_l       
 
     def __call__(self,x1,x2,i,j):
-        f1=ES_theta**2
+        f1=self.ES_theta**2
         f2=(x1-x2)**2
-        f3=ES_l**3
-        f4=ES_l**2
+        f3=self.ES_l**3
+        f4=self.ES_l**2
         return f1* (f2/f3)*  np.exp(-0.5 * f2/f4)
  
 class ExpSineSquared(Kernel):
@@ -101,6 +114,53 @@ class ExpSineSquared(Kernel):
         f4 = self.ESS_P
         return f1*np.exp(-2*(np.sin(np.pi*f3/f4))**2/f2)     
 
+class dExpSineSquared_dtheta(Kernel): # derivada em ordem a ESS_theta
+    def __init__(self, ESS_theta, ESS_l, ESS_P):
+        super(dExpSineSquared_dtheta, self).__init__(ESS_theta, ESS_l, ESS_P)
+
+        self.ESS_theta = ESS_theta
+        self.ESS_l = ESS_l
+        self.ESS_P = ESS_P
+        
+    def __call__(self,x1,x2,i,j):
+        f1 = self.ESS_theta *2
+        f2 = self.ESS_l**2
+        f3 = np.pi/self.ESS_P
+        f4 = x1-x2
+        return f1*np.exp(-(2/f2)*np.sin(f3*f4))
+
+class dExpSineSquared_dl(Kernel): # derivada em ordem a ESS_l
+    def __init__(self, ESS_theta, ESS_l, ESS_P):
+        super(dExpSineSquared_dl, self).__init__(ESS_theta, ESS_l, ESS_P)
+
+        self.ESS_theta = ESS_theta
+        self.ESS_l = ESS_l
+        self.ESS_P = ESS_P
+        
+    def __call__(self,x1,x2,i,j):
+        f1=4* self.ESS_theta**2
+        f2=self.ESS_l**3
+        f3=np.pi/self.ESS_P
+        f4=x1-x2
+        f5=self.ESS_l**2
+        return (f1*np.sin(f3*f4)/f2) * np.exp(-2*np.sin(f3*f4)/f5)
+        
+class dExpSineSquared_dP(Kernel): #derivada em ordem a ESS_P
+    def __init__(self, ESS_theta, ESS_l, ESS_P):
+        super(dExpSineSquared_dP, self).__init__(ESS_theta, ESS_l, ESS_P)
+
+        self.ESS_theta = ESS_theta
+        self.ESS_l = ESS_l
+        self.ESS_P = ESS_P
+        
+    def __call__(self,x1,x2,i,j):
+        f1=2*np.pi*self.ESS_theta**2
+        f2=self.ESS_l**2
+        f3=np.pi/self.ESS_P
+        f4=self.ESS_P**2
+        f5=x1-x2
+        return (f1/(f2*f4)) * f5*np.cos(f3*f5) * np.exp(-2*np.sin(f3*f5)/f2) 
+      
 class RatQuadratic(Kernel):
     def __init__(self, RQ_theta, RQ_l, RQ_alpha):
         super(RatQuadratic, self).__init__(RQ_theta, RQ_l, RQ_alpha)
@@ -114,35 +174,63 @@ class RatQuadratic(Kernel):
         f3 = (x1-x2)**2
         f4 = self.RQ_alpha
         return f1*(1+(0.5*f3/(f4*f2)))**(-f4)
-        
-class Local_ExpSineSquared(Kernel): #equal to ExpSquared*ExpSineSquared
-    def __init__(self, LESS_theta, LESS_l, LESS_P):
-        super(Local_ExpSineSquared, self).__init__(LESS_theta, LESS_l, LESS_P)
-        self.LESS_theta = LESS_theta
-        self.LESS_l = LESS_l
-        self.LESS_P = LESS_P
-        
-    def __call__(self, x1 ,x2 , i,  j):
-        f1 = self.LESS_theta**2                               
-        f2 = self.LESS_l**2
-        f3 = (x1-x2)
-        f4 = (x1-x2)**2
-        f5 = self.LESS_P
-        return f1*np.exp(-2*(np.sin(np.pi*f3/f5))**2/f2)*np.exp(-0.5*f4/f2)        
+            
+class dRatQuadratic_dtheta(Kernel): #derivada em ordem a RQ_theta
+    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
+        super(dRatQuadratic_dtheta, self).__init__(RQ_theta, RQ_l, RQ_alpha)
+        self.RQ_theta = RQ_theta
+        self.RQ_l = RQ_l
+        self.RQ_alpha = RQ_alpha           
+            
+    def __call__(self,x1,x2,i,j):
+        f1=self.RQ_theta*2
+        f2=(x1-x2)**2
+        f3=self.RQ_alpha
+        f4=self.RQ_l**2
+        return f1*(1 + 0.5*f2/(f3*f4))**(-f3)
 
-class WhiteNoise(Kernel):
-    def __init__(self,WN_theta):
-        super(WhiteNoise,self).__init__(WN_theta)
-        self.WN_theta=WN_theta
-    
+class dRatQuadratic_dl(Kernel): #derivada em ordem a RQ_l
+    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
+        super(dRatQuadratic_dl, self).__init__(RQ_theta, RQ_l, RQ_alpha)
+        self.RQ_theta = RQ_theta
+        self.RQ_l = RQ_l
+        self.RQ_alpha = RQ_alpha      
+            
+    def __call__(self,x1,x2,i,j):
+        f1=self.RQ_theta**2
+        f2=(x1-x2)**2
+        f3=self.RQ_alpha
+        f4=self.RQ_l**2
+        f5=self.RQ_l**3
+        return (f1*f2/f5)*(1 + 0.5*f2/(f3*f4))**(-1-f3)
+ 
+class dRatQuadratic_dalpha(Kernel): #derivada em ordem a RQ_alpha
+    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
+        super(dRatQuadratic_dalpha, self).__init__(RQ_theta, RQ_l, RQ_alpha)
+        self.RQ_theta = RQ_theta
+        self.RQ_l = RQ_l
+        self.RQ_alpha = RQ_alpha           
+            
+    def __call__(self,x1,x2,i,j):
+        f1=self.RQ_theta*2
+        f2=(x1-x2)**2
+        f3=self.RQ_alpha
+        f4=self.RQ_l**2
+        func1=0.5*f2/(f3*f4*(1 + 0.5*f2/(f3*f4)))
+        func2=1+ 0.5*f2/(f3*f4)
+        return f1*(func1 - np.log(func2)) * func2**(-f3)
+        
+class WhiteNoise(Kernel):                             #In case the white noise
+    def __init__(self,WN_theta):                      #is proved to be wrong
+        super(WhiteNoise,self).__init__(WN_theta)     #it will be necessary
+        self.WN_theta=WN_theta                        #to remove i and j from
+                                                      #all classes __call__
     def __call__(self, x1, x2, i, j):
         f1=self.WN_theta**2
         #f2=(x1-x2)     
         f3=kd(i,j)
         return f1*f3
-# In case the white noise is proved to be wrong, it will be necessary
-#to remove i and j from all  classes __call__
-        
+
 class Exponential(Kernel): #Matern 1/2 = Exponential
     def __init__(self,Exp_theta,Exp_l):
         super(Exponential,self).__init__(Exp_theta,Exp_l)
@@ -181,9 +269,7 @@ class Matern_52(Kernel): #Matern 5/2
         f5=self.M52_theta**2
         return f5*(1.0 + f1/f3 + (5.0*f4)/(3.0*f4))*np.exp(-f1/f3)
 
-
-
-     
+ 
 ##### LIKELIHOOD
 def lnlike(K, r): #log-likelihood calculations
     from scipy.linalg import cho_factor, cho_solve
@@ -228,7 +314,7 @@ def gradient(K_grad,r):
     
 def grad_log_p(kernel,x,xcalc,y,yerr):
     if kernel is ExpSquared:
-        kernel = ExpSquared_l(variables(kernel))
+        kernel = dExpSquared_dl(variables(kernel))
         K_grad = np.zeros((len(x),len(x))) #covariance matrix K
         for i in range(len(x)):
             x1 = x[i]
@@ -249,7 +335,22 @@ def grad_log_p(kernel,x,xcalc,y,yerr):
     
     
 ###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
-    
+
+#class Local_ExpSineSquared(Kernel): #equal to ExpSquared*ExpSineSquared
+#    def __init__(self, LESS_theta, LESS_l, LESS_P):
+#        super(Local_ExpSineSquared, self).__init__(LESS_theta, LESS_l, LESS_P)
+#        self.LESS_theta = LESS_theta
+#        self.LESS_l = LESS_l
+#        self.LESS_P = LESS_P
+#        
+#    def __call__(self, x1 ,x2 , i,  j):
+#        f1 = self.LESS_theta**2                               
+#        f2 = self.LESS_l**2
+#        f3 = (x1-x2)
+#        f4 = (x1-x2)**2
+#        f5 = self.LESS_P
+#        return f1*np.exp(-2*(np.sin(np.pi*f3/f5))**2/f2)*np.exp(-0.5*f4/f2)   
+
 #def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 #    start = time() #Corrected and faster version    
 #    K = np.zeros((len(x),len(x))) #covariance matrix K
