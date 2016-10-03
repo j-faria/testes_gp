@@ -300,11 +300,11 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 
 
 ##### LIKELIHOOD GRADIENT
-def variables(kernel):
-    return [i for i in kernel.pars[:]] #valor das variaveis da kernel
+def variables(kernel): #devolve o valor das variaveis da kernel usada
+    return [i for i in kernel.pars[:]] 
 
-def variablesLen(kernel):
-    return len([i for i in kernel.pars[:]]) #numero de variaveis na kernel
+def variablesLen(kernel): #devolve o numero de variaveis na kernel usada
+    return len([i for i in kernel.pars[:]]) 
 
 
 #   De acordo com o que encontrei no Rasmussen&Williams
@@ -316,7 +316,9 @@ def gradient(K_grad,r):
     sol = cho_solve(L1, r)
     grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-np.linalg.inv(K)),K_grad))
     return grad_likelihood
-    
+        
+#   Calcular matriz de covariancia K das derivadas da kernel
+#que estamos a usar 
 def grad_log_p(kernel,x,xcalc,y,yerr):
     a = variablesLen(kernel)
     n = range(a)
