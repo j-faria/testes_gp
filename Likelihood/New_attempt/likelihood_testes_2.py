@@ -31,16 +31,16 @@ print('-> lonely kernel')
 kernel0=kl.ExpSquared(19.0, 2.0)
 kl.likelihood(kernel0, x1, x1, y1, yerr1)
 
-start = time() # Calculation using george 
-kernel = 19**2*ExpSquaredKernel(2.0**2)
-gp = george.GP(kernel)
-gp.compute(x1,yerr1)
-print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y1))
+#start = time() # Calculation using george 
+#kernel = 19**2*ExpSquaredKernel(2.0**2)
+#gp = george.GP(kernel)
+#gp.compute(x1,yerr1)
+#print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y1))
 
 print 'variaveis ->', kl.variables(kernel0)
+print 'numero de variaveis ->', kl.variablesLen(kernel0)
 
-a=kl.variables(kernel0)
-print grad_log_p(ExpSquared(19.0,2.0),x1,x1,y1,yerr1) #devolve None
+print kl.grad_log_p(kernel0,x1,x1,y1,yerr1) #devolve None
 
 
 
