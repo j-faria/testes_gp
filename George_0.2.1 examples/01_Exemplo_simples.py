@@ -25,7 +25,7 @@ import george
 from george.kernels import ExpSquaredKernel, Matern32Kernel, CosineKernel
 
     #Set up the Gaussian process.
-kernel = ExpSquaredKernel(1.0)  #original do exemplo
+kernel = 1*ExpSquaredKernel(1.0)  #original do exemplo
 #kernel = CosineKernel(1.0)
 gp = george.GP(kernel)
 
@@ -34,6 +34,7 @@ gp.compute(x, yerr)
 
     #Compute the log likelihood.
 print(gp.lnlikelihood(y))
+print(gp.grad_lnlikelihood(y))
 #like=gp.lnlikelihood(y)
 
     #Compute the predicted values of the function at a fine grid of points 
