@@ -32,6 +32,21 @@ class Kernel(object):
         """ Representation of each Kernel instance """
         return "{0}({1})".format(self.__class__.__name__,
                                  ", ".join(map(str, self.pars)))
+                                 
+    # Rever - tirado do george e  ver o .gradient_symmetric   
+    def gradient(self, x1, x2=None):
+        x1 = np.ascontiguousarray(x1, dtype=np.float64)
+        if x2 is None:
+            g = self.gradient_symmetric(x1)
+        else:
+            x2 = np.ascontiguousarray(x2, dtype=np.float64)
+            g = self.gradient_general(x1, x2)
+        return g * self.vector_gradient[None, None, :]
+
+    @property
+    def vector_gradient(self):
+        return self.pars
+    #####
 
 class _operator(Kernel):
     def __init__(self, k1, k2):
@@ -149,127 +164,7 @@ class Matern_52(Kernel): #Matern 5/2
         f4=self.M52_l**2
         f5=self.M52_theta**2
         return f5*(1.0 + f1/f3 + (5.0*f4)/(3.0*f4))*np.exp(-f1/f3)
-
-#Derivadas 
-class dExpSquared_dtheta(ExpSquared): #derivadada em ordem a ES_theta
-    def __init__(self, ES_theta, ES_l):
-        super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
-        
-        self.ES_theta = ES_theta
-        self.ES_l = ES_l
-
-    def __call__(self,x1,x2,i,j):
-        f1=self.ES_theta *2            
-        f2=(x1-x2)**2
-        f3=self.ES_l**2
-        return  f1*np.exp(-0.5*f2/f3)        
     
-class dExpSquared_dl(ExpSquared): #derivada em ordem a ES_l
-    def __init__(self, ES_theta, ES_l):
-        super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
-        
-        self.ES_theta = ES_theta
-        self.ES_l = ES_l       
-
-    def __call__(self,x1,x2,i,j):
-        f1=self.ES_theta**2
-        f2=(x1-x2)**2
-        f3=self.ES_l**3
-        f4=self.ES_l**2
-        return f1* (f2/f3)*  np.exp(-0.5 * f2/f4) 
-
-class dExpSineSquared_dtheta(ExpSineSquared): # derivada em ordem a ESS_theta
-    def __init__(self, ESS_theta, ESS_l, ESS_P):
-        super(dExpSineSquared_dtheta, self).__init__(ESS_theta, ESS_l, ESS_P)
-
-        self.ESS_theta = ESS_theta
-        self.ESS_l = ESS_l
-        self.ESS_P = ESS_P
-        
-    def __call__(self,x1,x2,i,j):
-        f1 = self.ESS_theta *2
-        f2 = self.ESS_l**2
-        f3 = np.pi/self.ESS_P
-        f4 = x1-x2
-        return f1*np.exp(-(2/f2)*np.sin(f3*f4))
-
-class dExpSineSquared_dl(ExpSineSquared): # derivada em ordem a ESS_l
-    def __init__(self, ESS_theta, ESS_l, ESS_P):
-        super(dExpSineSquared_dl, self).__init__(ESS_theta, ESS_l, ESS_P)
-
-        self.ESS_theta = ESS_theta
-        self.ESS_l = ESS_l
-        self.ESS_P = ESS_P
-        
-    def __call__(self,x1,x2,i,j):
-        f1=4* self.ESS_theta**2
-        f2=self.ESS_l**3
-        f3=np.pi/self.ESS_P
-        f4=x1-x2
-        f5=self.ESS_l**2
-        return (f1*np.sin(f3*f4)/f2) * np.exp(-2*np.sin(f3*f4)/f5)
-        
-class dExpSineSquared_dP(ExpSineSquared): #derivada em ordem a ESS_P
-    def __init__(self, ESS_theta, ESS_l, ESS_P):
-        super(dExpSineSquared_dP, self).__init__(ESS_theta, ESS_l, ESS_P)
-
-        self.ESS_theta = ESS_theta
-        self.ESS_l = ESS_l
-        self.ESS_P = ESS_P
-        
-    def __call__(self,x1,x2,i,j):
-        f1=2*np.pi*self.ESS_theta**2
-        f2=self.ESS_l**2
-        f3=np.pi/self.ESS_P
-        f4=self.ESS_P**2
-        f5=x1-x2
-        return (f1/(f2*f4)) * f5*np.cos(f3*f5) * np.exp(-2*np.sin(f3*f5)/f2) 
-            
-class dRatQuadratic_dtheta(RatQuadratic): #derivada em ordem a RQ_theta
-    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
-        super(dRatQuadratic_dtheta, self).__init__(RQ_theta, RQ_l, RQ_alpha)
-        self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
-        self.RQ_alpha = RQ_alpha           
-            
-    def __call__(self,x1,x2,i,j):
-        f1=self.RQ_theta*2
-        f2=(x1-x2)**2
-        f3=self.RQ_alpha
-        f4=self.RQ_l**2
-        return f1*(1 + 0.5*f2/(f3*f4))**(-f3)
-
-class dRatQuadratic_dl(RatQuadratic): #derivada em ordem a RQ_l
-    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
-        super(dRatQuadratic_dl, self).__init__(RQ_theta, RQ_l, RQ_alpha)
-        self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
-        self.RQ_alpha = RQ_alpha      
-            
-    def __call__(self,x1,x2,i,j):
-        f1=self.RQ_theta**2
-        f2=(x1-x2)**2
-        f3=self.RQ_alpha
-        f4=self.RQ_l**2
-        f5=self.RQ_l**3
-        return (f1*f2/f5)*(1 + 0.5*f2/(f3*f4))**(-1-f3)
- 
-class dRatQuadratic_dalpha(RatQuadratic): #derivada em ordem a RQ_alpha
-    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
-        super(dRatQuadratic_dalpha, self).__init__(RQ_theta, RQ_l, RQ_alpha)
-        self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
-        self.RQ_alpha = RQ_alpha           
-            
-    def __call__(self,x1,x2,i,j):
-        f1=self.RQ_theta*2
-        f2=(x1-x2)**2
-        f3=self.RQ_alpha
-        f4=self.RQ_l**2
-        func1=0.5*f2/(f3*f4*(1 + 0.5*f2/(f3*f4)))
-        func2=1+ 0.5*f2/(f3*f4)
-        return f1*(func1 - np.log(func2)) * func2**(-f3)        
-        
         
 ##### LIKELIHOOD
 def lnlike(K, r): #log-likelihood calculations
@@ -309,21 +204,21 @@ def variablesLen(kernel): #devolve o numero de variaveis na kernel usada
 
 #   De acordo com o que encontrei no Rasmussen&Williams
 #o gradiente terá a forma = grad_likelihood
-def gradient(K_grad,r):
-    from scipy.linalg import cho_factor, cho_solve
-    L1 = cho_factor(K_grad)  # tuple (L, lower)
-    # this is K^-1*(r)
-    sol = cho_solve(L1, r)
-    grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-np.linalg.inv(K)),K_grad))
-    return grad_likelihood
+#def gradient(K_grad,r):
+#    from scipy.linalg import cho_factor, cho_solve
+#    L1 = cho_factor(K_grad)  # tuple (L, lower)
+#    # this is K^-1*(r)
+#    sol = cho_solve(L1, r)
+#    K_inv = np.linalg.inv(K_grad)
+#    Kg = kernel.gradient(x)
+#    grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-k_inv),Kg))
+#    return grad_likelihood
         
 #   Calcular matriz de covariancia K das derivadas da kernel
 #que estamos a usar 
 def grad_log_p(kernel,x,xcalc,y,yerr):
-    a = variablesLen(kernel)
-    n = range(a)
-    kernel = dExpSquared_dl(variables(kernel))
-    K_grad = np.zeros((len(x),len(x))) #covariance matrix K
+    from scipy.linalg import cho_factor, cho_solve
+    K_grad = np.zeros((len(x),len(x))) #covariance matrix K start
     for i in range(len(x)):
         x1 = x[i]
         i=i
@@ -331,10 +226,19 @@ def grad_log_p(kernel,x,xcalc,y,yerr):
             x2 = xcalc[j]
             j=j
             K_grad[i,j] = kernel(x1, x2, i, j)
-    K_grad=K_grad+yerr**2*np.identity(len(x)) 
-    gradient_logp = gradient(K_grad,y)
-    return gradient_logp
-
+    K_grad=K_grad+yerr**2*np.identity(len(x)) #covariance matrix K result
+    #gradient_log_p(K_grad,y)    
+    #return K_grad
+    
+    L1 = cho_factor(K_grad)  # tuple (L, lower)
+    # this is K^-1*(r)
+    sol = cho_solve(L1, y)
+    K_inv = np.linalg.inv(K_grad)
+    
+    #falta olhar para o george e ver/interpretar o .gradient
+    Kg = kernel.gradient(x) 
+    grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-K_inv),Kg))
+    return grad_likelihood
 
 
 
@@ -489,6 +393,5 @@ def grad_log_p(kernel,x,xcalc,y,yerr):
 #    f2 = ESS_l**2
 #    f3 = (x1-x2)
 #    return f1*np.exp(-2*(np.sin(np.pi*f3/ESS_P))**2/f2)
-
 
 
