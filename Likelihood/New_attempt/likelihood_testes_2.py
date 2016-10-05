@@ -42,7 +42,7 @@ print 'numero de variaveis ->', kl.variablesLen(kernel0)
 
 print kl.grad_log_p(kernel0,x1,x1,y1,yerr1) #devolve None
 
-
+#print  kl.grad_lnlikelihood(kernel0,y1)
 
 
 ###### Sum of kernels #####
