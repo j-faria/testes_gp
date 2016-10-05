@@ -1,3 +1,19 @@
+		05/10/2016
+
+- Tentado ver o george e aplicar feito lá  no calculo do
+gradiente ao nosso.
+
+- Falta perceber o que o george faz com os parametros
+self.gradient_symmetric(x1) e self.gradient_general(x1,x2).
+
+- Ver as linhas 36 a 49 e as linhas 197 a 241, todos os
+problemas/erros a resolver estão ai.
+
+-Adicionado o ficheiro "Kernel_derivatives.py", ignorar
+porque apenas contem as derivadas parciais feitas à mão
+das kernels e como nao queria perde-las metias todas 
+num ficheiro à parte.
+
 		30/09/2016
 
 - Adicionadas kernels das derivadas parcias de cada kernel
@@ -10,7 +26,6 @@ gradiente
 - Tentado criar função capaz de calcular o gradiente do log
 likelihood mas ainda tem muitos erros até ser capaz de fazer
 um calculo correcto.
-
 
 		27/09/2016
 
