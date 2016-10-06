@@ -16,7 +16,8 @@ class Kernel(object):
         self.pars = np.array(args)
 
     def __call__(self, x1, x2, i, j):
-        raise NotImplementedError
+        #raise NotImplementedError
+        return self.k1(x1, x2, i, j) * self.k2(x1, x2, i, j)
 
     def __add__(self, b):
         return Sum(self, b)
@@ -33,7 +34,8 @@ class Kernel(object):
         return "{0}({1})".format(self.__class__.__name__,
                                  ", ".join(map(str, self.pars)))
                                  
-    # Rever - tirado do george e  ver o .gradient_symmetric   
+    # Rever - tirado do george e ver como adaptar
+    # self.gradient_symmetric e self.gradient_general  
     def gradient(self, x1, x2=None):
         x1 = np.ascontiguousarray(x1, dtype=np.float64)
         if x2 is None:
