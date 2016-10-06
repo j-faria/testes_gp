@@ -40,7 +40,7 @@ kl.likelihood(kernel0, x1, x1, y1, yerr1)
 print 'variaveis ->', kl.variables(kernel0)
 print 'numero de variaveis ->', kl.variablesLen(kernel0)
 variavel=kl.variables(kernel0) #deveolve 19.0 e 2.0
-#print kl.grad_log_p(kernel0,x1,x1,y1,yerr1) #devolve None
+print kl.grad_log_p(kernel0,x1,x1,y1,yerr1) #devolve None
 #print  kl.grad_lnlikelihood(kernel0,y1)
 
 import numpy, algopy
@@ -54,10 +54,10 @@ import numpy, algopy
 #cg.dependentFunctionList = [y]
 #print cg.gradient(numpy.array(x1))
 
-x = UTPM.init_jacobian(variavel)
-y = kernel0
-algopy_jacobian = UTPM.extract_jacobian(y)
-print('jacobian = ',algopy_jacobian)
+#x = UTPM.init_jacobian(variavel)
+#y = kernel0
+#algopy_jacobian = UTPM.extract_jacobian(y)
+#print('jacobian = ',algopy_jacobian)
 
 
 
