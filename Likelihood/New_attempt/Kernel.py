@@ -16,8 +16,8 @@ class Kernel(object):
         self.pars = np.array(args)
 
     def __call__(self, x1, x2, i, j):
-        #raise NotImplementedError
-        return self.k1(x1, x2, i, j) * self.k2(x1, x2, i, j)
+        raise NotImplementedError
+        #return self.k1(x1, x2, i, j) * self.k2(x1, x2, i, j)
 
     def __add__(self, b):
         return Sum(self, b)
@@ -238,11 +238,13 @@ def grad_log_p(kernel,x,xcalc,y,yerr):
     K_inv = np.linalg.inv(K_grad)
     
     #falta olhar para o george e ver/interpretar o .gradient
-    Kg = kernel.gradient(x) 
-    grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-K_inv),Kg))
+    #Kg = kernel.gradient(x) 
+    grad_likelihood = 0.5*np.trace(np.dot((np.dot(sol,sol.T)-K_inv),K_grad))
     return grad_likelihood
 
-
+#### PROBLEMA: 
+    #K_grad ta a calculcar da kernel, meter ifs a ver se calcula a
+    #partir das derivadas
 
     
     
