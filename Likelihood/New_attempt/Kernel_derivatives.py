@@ -35,7 +35,7 @@ class Kernel(object):
 
     
 #Derivadas 
-class dExpSquared_dtheta(Kernel): #derivadada em ordem a ES_theta
+class dExpSquared_dtheta(Kernel): #derivative in order to ES_theta
     def __init__(self, ES_theta, ES_l):
         super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
         
@@ -48,7 +48,7 @@ class dExpSquared_dtheta(Kernel): #derivadada em ordem a ES_theta
         f3=self.ES_l**2
         return  f1*np.exp(-0.5*f2/f3)        
     
-class dExpSquared_dl(Kernel): #derivada em ordem a ES_l
+class dExpSquared_dl(Kernel): #derivative in order to ES_l
     def __init__(self, ES_theta, ES_l):
         super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
         
