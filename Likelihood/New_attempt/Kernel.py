@@ -351,7 +351,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad1=grad_logp(dExpSquared_dtheta(a,b),x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(dExpSquared_dl(a,b),x,xcalc,y,yerr,cov_matrix)
         print 'gradient ->', grad1, grad2
-    if isinstance(kernel,ExpSineSquared) is True:
+    elif isinstance(kernel,ExpSineSquared) is True:
         a=variables(kernel)[0] #devolve os valores de theta
         b=variables(kernel)[1] #de l
         c=variables(kernel)[2] # e de P
@@ -359,7 +359,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad2=grad_logp(dExpSineSquared_dl(a,b,c),x,xcalc,y,yerr,cov_matrix)
         grad3=grad_logp(dExpSineSquared_dP(a,b,c),x,xcalc,y,yerr,cov_matrix)
         print 'gradient ->', grad1, grad2, grad3    
-    if isinstance(kernel,RatQuadratic) is True:
+    elif isinstance(kernel,RatQuadratic) is True:
         a=variables(kernel)[0] #devolve os valores de theta
         b=variables(kernel)[1] #de l
         c=variables(kernel)[2] # e de alpha
