@@ -334,17 +334,27 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
     alpha = np.dot(K_inv,y)
     alpha_trans = alpha.T
     
-    #formulas do gradiente tiradas do Rasmussen&Williams
-    #o grad comentado dá valores absurdos e não sei o porquê
-    grad=0.5*np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
-            -0.5*np.trace(np.dot(K_inv,K_grad))
-    #grad_outro=0.5*np.trace(np.dot(np.dot(alpha,alpha_trans)-K_inv,K_grad))
+#formulas do gradiente tiradas do Rasmussen&Williams chapter 5, equaçao(5.9)
+       
+    #os return grad comentados dao valores absurdos e não sei o porquê
+    grad = 0.5 * np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
+            -0.5 * np.einsum('ij,ij',K_inv,K_grad)   
+            #-0.5*np.trace(np.dot(K_inv,K_grad))
+            
+#    calc_aux=np.dot(alpha,alpha_trans)-K_inv        
+    calc_aux = (alpha * alpha_trans) - K_inv
+    grad_outro = 0.5 * np.trace(np.dot(calc_aux,K_grad))
+    grad_adaptgeorge = 0.5 * np.einsum('ij,ij',calc_aux,K_grad) #adaptado do george
     return grad
-    #return grad_outro
+#    return grad_outro
+#    return grad_adaptgeorge
+#    return np.dot(calc_aux,K_grad)
 
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
     import inspect
-    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)#ele volta a imprimir a likelihood acho que por causa disto    
+    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)#ele volta a imprimir a likelihood acho que 
+                                                #por causa disto mas preciso da matriz de 
+                                                #covariancia original
     if isinstance(kernel,ExpSquared) is True:
         a=variables(kernel)[0] #devolve os valores de theta 
         b=variables(kernel)[1] # e de l   
@@ -372,6 +382,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
     #   Nao apliquei a mesma logica às kernels exponential e matern pois
     #até isto funcionar como deve ser não vale a pena fazer
     #funcionar como deve ser = saber se estou a calcular o gradiente bem
+    #e arranjar maneira de isto funcionar com somas e multiplicaçoes de kernels
         
         
 ###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
