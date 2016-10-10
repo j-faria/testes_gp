@@ -329,7 +329,7 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
             x2 = xcalc[j]
             j=j
             K_grad[i,j] = kernel(x1, x2, i, j)
-    K_grad=K_grad+yerr**2*np.identity(len(x))
+    K_grad=K_grad+yerr**2*np.identity(len(x))#sinceramente não sei se esta linha faz sentido neste calculo
     K_inv = np.linalg.inv(cov_matrix)    
     alpha = np.dot(K_inv,y)
     alpha_trans = alpha.T
@@ -344,7 +344,7 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
 
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
     import inspect
-    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)    #ele volta a imprimir a likelihood acho que por causa disto    
+    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)#ele volta a imprimir a likelihood acho que por causa disto    
     if isinstance(kernel,ExpSquared) is True:
         a=variables(kernel)[0] #devolve os valores de theta 
         b=variables(kernel)[1] # e de l   
