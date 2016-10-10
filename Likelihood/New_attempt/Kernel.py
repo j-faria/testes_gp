@@ -368,7 +368,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad3=grad_logp(dRatQuadratic_dalpha(a,b,c),x,xcalc,y,yerr,cov_matrix)
         print 'gradient ->', grad1, grad2, grad3    
     else:
-        pass    
+        print 'gradient -> no calculation'    
     #   Nao apliquei a mesma logica às kernels exponential e matern pois
     #até isto funcionar como deve ser não vale a pena fazer
     #funcionar como deve ser = saber se estou a calcular o gradiente bem
