@@ -50,7 +50,7 @@ class dExpSquared_dtheta(Kernel): #derivative in order to ES_theta
     
 class dExpSquared_dl(Kernel): #derivative in order to ES_l
     def __init__(self, ES_theta, ES_l):
-        super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
+        super(dExpSquared_dl,self).__init__(ES_theta, ES_l)
         
         self.ES_theta = ES_theta
         self.ES_l = ES_l       
