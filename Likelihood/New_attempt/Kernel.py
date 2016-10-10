@@ -176,9 +176,9 @@ class dExpSquared_dtheta(Kernel): #derivative in order to ES_theta
         self.ES_l = ES_l
 
     def __call__(self,x1,x2,i,j):
-        f1=self.ES_theta *2            
-        f2=(x1-x2)**2
-        f3=self.ES_l**2
+        f1=self.ES_theta *2     #2*theta        
+        f2=(x1-x2)**2           #(x1-x2)**2
+        f3=self.ES_l**2         #l**2
         return  f1*np.exp(-0.5*f2/f3)        
     
 class dExpSquared_dl(Kernel): #derivative in order to ES_l
@@ -189,10 +189,10 @@ class dExpSquared_dl(Kernel): #derivative in order to ES_l
         self.ES_l = ES_l       
 
     def __call__(self,x1,x2,i,j):
-        f1=self.ES_theta**2
-        f2=(x1-x2)**2
-        f3=self.ES_l**3
-        f4=self.ES_l**2
+        f1=self.ES_theta**2     #theta**2
+        f2=(x1-x2)**2           #(x1-x2)**2
+        f3=self.ES_l**3         #l**3
+        f4=self.ES_l**2         #l**2
         return f1* (f2/f3)*  np.exp(-0.5 * f2/f4) 
 
 class dExpSineSquared_dtheta(Kernel): # derivada em ordem a ESS_theta
@@ -204,9 +204,9 @@ class dExpSineSquared_dtheta(Kernel): # derivada em ordem a ESS_theta
         self.ESS_P = ESS_P
         
     def __call__(self,x1,x2,i,j):
-        f1 = self.ESS_theta *2
-        f2 = self.ESS_l**2
-        f3 = np.pi/self.ESS_P
+        f1 = self.ESS_theta *2  #2*theta
+        f2 = self.ESS_l**2      #l**2 
+        f3 = np.pi/self.ESS_P   #
         f4 = x1-x2
         return f1*np.exp(-(2/f2)*np.sin(f3*f4))
 
@@ -319,12 +319,9 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
 ##### LIKELIHOOD GRADIENT
 def variables(kernel): #devolve o valor das variaveis da kernel usada
     return [i for i in kernel.pars[:]] 
-
-def variablesLen(kernel): #devolve o numero de variaveis na kernel usada
-    return len([i for i in kernel.pars[:]]) 
  
 def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
-    K_grad = np.zeros((len(x),len(x))) #covariance matrix K start
+    K_grad = np.zeros((len(x),len(x))) 
     for i in range(len(x)):
         x1 = x[i]
         i=i
@@ -332,22 +329,29 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
             x2 = xcalc[j]
             j=j
             K_grad[i,j] = kernel(x1, x2, i, j)
-    K_grad=K_grad+yerr**2*np.identity(len(x)) #covariance matrix K result
+    K_grad=K_grad+yerr**2*np.identity(len(x))
     K_inv = np.linalg.inv(cov_matrix)    
-    alpha = np.dot(K_inv,y)    
-    grad=0.5*np.trace(np.dot(np.dot(alpha,alpha.T)-K_inv,K_grad))
+    alpha = np.dot(K_inv,y)
+    alpha_trans = alpha.T
+    
+    #formulas do gradiente tiradas do Rasmussen&Williams
+    #o grad comentado dá valores absurdos e não sei o porquê
+    grad=0.5*np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
+            -0.5*np.trace(np.dot(K_inv,K_grad))
+    #grad_outro=0.5*np.trace(np.dot(np.dot(alpha,alpha_trans)-K_inv,K_grad))
     return grad
+    #return grad_outro
 
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
-    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)    #ele volta a imprimir a    
-                                                    #likelihood por causa disto
-    if kernel is ExpSquared:
+    import inspect
+    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)    #ele volta a imprimir a likelihood acho que por causa disto    
+    if isinstance(kernel,ExpSquared) is True:
         a=variables(kernel)[0] #devolve os valores de theta 
         b=variables(kernel)[1] # e de l   
         grad1=grad_logp(dExpSquared_dtheta(a,b),x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(dExpSquared_dl(a,b),x,xcalc,y,yerr,cov_matrix)
         print 'gradient ->', grad1, grad2
-    elif kernel is ExpSineSquared:
+    if isinstance(kernel,ExpSineSquared) is True:
         a=variables(kernel)[0] #devolve os valores de theta
         b=variables(kernel)[1] #de l
         c=variables(kernel)[2] # e de P
@@ -355,7 +359,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad2=grad_logp(dExpSineSquared_dl(a,b,c),x,xcalc,y,yerr,cov_matrix)
         grad3=grad_logp(dExpSineSquared_dP(a,b,c),x,xcalc,y,yerr,cov_matrix)
         print 'gradient ->', grad1, grad2, grad3    
-    elif kernel is RatQuadratic:
+    if isinstance(kernel,RatQuadratic) is True:
         a=variables(kernel)[0] #devolve os valores de theta
         b=variables(kernel)[1] #de l
         c=variables(kernel)[2] # e de alpha
@@ -364,10 +368,10 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad3=grad_logp(dRatQuadratic_dalpha(a,b,c),x,xcalc,y,yerr,cov_matrix)
         print 'gradient ->', grad1, grad2, grad3    
     else:
-        pass
-    
-    #   Nao apliquei às kernels exponential e matern pois
-    #até isto funcionar não vale a pena fazer        
+        pass    
+    #   Nao apliquei a mesma logica às kernels exponential e matern pois
+    #até isto funcionar como deve ser não vale a pena fazer
+    #funcionar como deve ser = saber se estou a calcular o gradiente bem
         
         
 ###### A PARTIR DAQUI ACHO QUE NÃO É NECESSARIO MAS DEIXO FICAR NA MESMA ######
