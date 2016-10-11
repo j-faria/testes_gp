@@ -5,8 +5,7 @@ Created on Wed Sep  7 10:42:48 2016
 @author: camacho
 """
 import numpy as np
-from sympy import KroneckerDelta as kd
-from time import time   
+
  
 ##### KERNELS 
 class Kernel(object):
@@ -69,11 +68,26 @@ class ExpSquared(Kernel):
         self.ES_l = ES_l
         
     def __call__(self, x1, x2):
-        f1 = self.ES_theta**2
-        f2 = self.ES_l**2
-        f3 = (x1 - x2)**2
-        return f1 * np.exp(-0.5 * f3 / f2)
-         
+        f1 = self.ES_theta**2   #theta**2
+        f2 = self.ES_l**2       #l**2
+        f3 = (x1-x2)**2         #(x1-x2)**2
+        return f1 * np.exp(-0.5* f3/f2)
+
+    def dES_dtheta(self, x1, x2):        
+        f1=self.ES_theta    #theta        
+        f2=self.ES_l**2     #l**2
+        f3=(x1-x2)**2       #(x1-x2)**2
+        return  f1**2 * np.exp(-0.5 * f3/f2)        
+        #return  2*f1  * np.exp(-0.5*f3/f2)         
+        
+    def dES_dl(self, x1, x2):
+        f1=self.ES_theta**2     #theta**2
+        f2=self.ES_l**2         #l**2
+        f3=(x1-x2)**2           #(x1-x2)**2
+        f4=self.ES_l**3         #l**3
+        return f1 * (f3/f4)*  np.exp(-0.5 * f3/f2)          
+   
+     
 class ExpSineSquared(Kernel):
     def __init__(self, ESS_theta, ESS_l, ESS_P):
         super(ExpSineSquared, self).__init__(ESS_theta, ESS_l, ESS_P)
@@ -87,7 +101,31 @@ class ExpSineSquared(Kernel):
         f2 = self.ESS_l**2
         f3 = (x1-x2)
         f4 = self.ESS_P
-        return f1*np.exp(-2*(np.sin(np.pi*f3/f4))**2/f2)     
+        return f1*np.exp((-2/f2)*((np.sin(np.pi*f3/f4))**2))     
+      
+    def dESS_dtheta(self,x1,x2):
+        f1 = self.ESS_theta     #theta
+        f2 = self.ESS_l**2      #l**2 
+        f3 = np.pi/self.ESS_P   #pi/P
+        f4 = x1-x2
+        return f1**2*np.exp(-(2.0/f2)*np.sin(f3*f4)**2)  
+    
+    def dESS_dl(self,x1,x2):
+        f1=4* self.ESS_theta**2
+        f2=self.ESS_l**3
+        f3=np.pi/self.ESS_P
+        f4=x1-x2
+        f5=self.ESS_l**2
+        return ((f1/f2)*np.sin(f3*f4)**2) * np.exp((-2/f5)*np.sin(f3*f4)**2)
+      
+    def dESS_dP(self,x1,x2):
+        f1=4*np.pi*self.ESS_theta**2    #4pi*theta**2
+        f2=self.ESS_l**2                #l**2
+        f3=np.pi/self.ESS_P             #pi/P
+        f4=self.ESS_P**2                #P**2
+        f5=x1-x2                        #x1-x2
+        return (f1*f5)/(f2*f4)* np.cos(f3*f5)*np.sin(f3*f5)* np.exp((-2.0/f2)*np.sin(f3*f5)**2) 
+
       
 class RatQuadratic(Kernel):
     def __init__(self, RQ_theta, RQ_l, RQ_alpha):
@@ -102,6 +140,32 @@ class RatQuadratic(Kernel):
         f3 = (x1-x2)**2
         f4 = self.RQ_alpha
         return f1*(1+(0.5*f3/(f4*f2)))**(-f4)
+            
+    def dRQ_dtheta(self,x1,x2):
+        f1=self.RQ_theta    #theta
+        f2=(x1-x2)**2       #(x1-x2)**2
+        f3=self.RQ_alpha    #alpha
+        f4=self.RQ_l**2     #l**2
+#        return 2*f1*(1.0 + f2/(2.0*f3*f4))**(-f3)
+        return f1**2*(1.0 + f2/(2.0*f3*f4))**(-f3)
+ 
+    def dRQ_dl(self,x1,x2):
+        f1=self.RQ_theta**2     #theta**2
+        f2=(x1-x2)**2           #(x1-x2)**2
+        f3=self.RQ_alpha        #alpha
+        f4=self.RQ_l**2         #l**2
+        f5=self.RQ_l**3         #l**3
+        return (f1*f2/f5)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
+        
+    def dRQ_dalpha(self,x1,x2):
+        f1=self.RQ_theta**2     #theta**2
+        f2=(x1-x2)**2           #(x1-x2)**2
+        f3=self.RQ_alpha        #alpha
+        f4=self.RQ_l**2         #l**2
+        func0=1.0 + f2/(2.0*f3*f4)
+        func1=f2/(2.0*f3*f4*func0)
+        return f1*(func1 - np.log(func0)) * func0**(-f3)        
+    
         
 class WhiteNoise(Kernel):                             #In case the white noise
     def __init__(self,WN_theta):                      #is proved to be wrong
@@ -156,128 +220,3 @@ class Matern_52(Kernel): #Matern 5/2
     #    return #a expressao da derivada
     
     
-#Kernels derivadas 
-class dExpSquared_dtheta(Kernel): #derivative in order to ES_theta
-    def __init__(self, ES_theta, ES_l):
-        super(dExpSquared_dtheta,self).__init__(ES_theta, ES_l)
-        
-        self.ES_theta = ES_theta
-        self.ES_l = ES_l
-
-    def __call__(self,x1,x2):
-        f1=self.ES_theta  #2*theta        
-        f2=(x1-x2)**2       #(x1-x2)**2
-        f3=self.ES_l**2     #l**2
-        return  2.0*f1*np.exp(-0.5*f2/f3)        
-    
-class dExpSquared_dl(Kernel): #derivative in order to ES_l
-    def __init__(self, ES_theta, ES_l):
-        super(dExpSquared_dl,self).__init__(ES_theta, ES_l)
-        
-        self.ES_theta = ES_theta
-        self.ES_l = ES_l       
-
-    def __call__(self,x1,x2):
-        f1=self.ES_theta**2     #theta**2
-        f2=(x1-x2)**2           #(x1-x2)**2
-        f3=self.ES_l**3         #l**3
-        f4=self.ES_l**2         #l**2
-        return f1* (f2/f3)*  np.exp(-0.5 * f2/f4) 
-
-class dExpSineSquared_dtheta(Kernel): #derivative in order of ESS_theta
-    def __init__(self, ESS_theta, ESS_l, ESS_P):
-        super(dExpSineSquared_dtheta, self).__init__(ESS_theta, ESS_l, ESS_P)
-
-        self.ESS_theta = ESS_theta
-        self.ESS_l = ESS_l
-        self.ESS_P = ESS_P
-        
-    def __call__(self,x1,x2):
-        f1 = self.ESS_theta *2  #2*theta
-        f2 = self.ESS_l**2      #l**2 
-        f3 = np.pi/self.ESS_P   #
-        f4 = x1-x2
-        return f1*np.exp(-(2.0/f2)*np.sin(f3*f4))
-
-class dExpSineSquared_dl(Kernel): #derivative in order of ESS_l
-    def __init__(self, ESS_theta, ESS_l, ESS_P):
-        super(dExpSineSquared_dl, self).__init__(ESS_theta, ESS_l, ESS_P)
-
-        self.ESS_theta = ESS_theta
-        self.ESS_l = ESS_l
-        self.ESS_P = ESS_P
-        
-    def __call__(self,x1,x2):
-        f1=4* self.ESS_theta**2
-        f2=self.ESS_l**3
-        f3=np.pi/self.ESS_P
-        f4=x1-x2
-        f5=self.ESS_l**2
-        return (f1*np.sin(f3*f4)/f2) * np.exp(-2*np.sin(f3*f4)/f5)
-        
-class dExpSineSquared_dP(Kernel): #derivative in order of ESS_P
-    def __init__(self, ESS_theta, ESS_l, ESS_P):
-        super(dExpSineSquared_dP, self).__init__(ESS_theta, ESS_l, ESS_P)
-
-        self.ESS_theta = ESS_theta
-        self.ESS_l = ESS_l
-        self.ESS_P = ESS_P
-        
-    def __call__(self,x1,x2):
-        f1=2*np.pi*self.ESS_theta**2
-        f2=self.ESS_l**2
-        f3=np.pi/self.ESS_P
-        f4=self.ESS_P**2
-        f5=x1-x2
-        return (f1/(f2*f4)) * f5*np.cos(f3*f5) * np.exp(-2*np.sin(f3*f5)/f2) 
-            
-class dRatQuadratic_dtheta(Kernel): #derivative in order of RQ_theta
-    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
-        super(dRatQuadratic_dtheta, self).__init__(RQ_theta, RQ_l, RQ_alpha)
-        self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
-        self.RQ_alpha = RQ_alpha           
-            
-    def __call__(self,x1,x2):
-        f1=self.RQ_theta*2
-        f2=(x1-x2)**2
-        f3=self.RQ_alpha
-        f4=self.RQ_l**2
-        return f1*(1 + 0.5*f2/(f3*f4))**(-f3)
-
-class dRatQuadratic_dl(Kernel): #derivative in order of RQ_l
-    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
-        super(dRatQuadratic_dl, self).__init__(RQ_theta, RQ_l, RQ_alpha)
-        self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
-        self.RQ_alpha = RQ_alpha      
-            
-    def __call__(self,x1,x2):
-        f1=self.RQ_theta**2
-        f2=(x1-x2)**2
-        f3=self.RQ_alpha
-        f4=self.RQ_l**2
-        f5=self.RQ_l**3
-        return (f1*f2/f5)*(1 + 0.5*f2/(f3*f4))**(-1-f3)
- 
-class dRatQuadratic_dalpha(Kernel): #derivative in order of RQ_alpha
-    def __init__(self,RQ_theta,RQ_l,RQ_alpha):
-        super(dRatQuadratic_dalpha, self).__init__(RQ_theta, RQ_l, RQ_alpha)
-        self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
-        self.RQ_alpha = RQ_alpha           
-            
-    def __call__(self,x1,x2):
-        f1=self.RQ_theta*2
-        f2=(x1-x2)**2
-        f3=self.RQ_alpha
-        f4=self.RQ_l**2
-        func1=0.5*f2/(f3*f4*(1 + 0.5*f2/(f3*f4)))
-        func2=1+ 0.5*f2/(f3*f4)
-        return f1*(func1 - np.log(func2)) * func2**(-f3)        
-    
-        
-
-
-        
-        
