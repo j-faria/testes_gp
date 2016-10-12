@@ -77,8 +77,8 @@ class ExpSquared(Kernel):
         f1=self.ES_theta    #theta        
         f2=self.ES_l**2     #l**2
         f3=(x1-x2)**2       #(x1-x2)**2
-        return  f1**2 * np.exp(-0.5 * f3/f2)        
-        #return  2*f1  * np.exp(-0.5*f3/f2)         
+        return  f1**2 * np.exp(-0.5 * f3/f2)    #Rever o que fazem no george
+        #return  2*f1  * np.exp(-0.5*f3/f2)     #para decidir qual return usar    
         
     def dES_dl(self, x1, x2):
         f1=self.ES_theta**2     #theta**2
@@ -99,7 +99,7 @@ class ExpSineSquared(Kernel):
     def __call__(self, x1, x2):
         f1 = self.ESS_theta**2
         f2 = self.ESS_l**2
-        f3 = (x1-x2)
+        f3 = np.abs(x1-x2)
         f4 = self.ESS_P
         return f1*np.exp((-2/f2)*((np.sin(np.pi*f3/f4))**2))     
       
@@ -107,14 +107,14 @@ class ExpSineSquared(Kernel):
         f1 = self.ESS_theta     #theta
         f2 = self.ESS_l**2      #l**2 
         f3 = np.pi/self.ESS_P   #pi/P
-        f4 = x1-x2
+        f4 = np.abs(x1-x2)
         return f1**2*np.exp(-(2.0/f2)*np.sin(f3*f4)**2)  
     
     def dESS_dl(self,x1,x2):
         f1=4* self.ESS_theta**2
         f2=self.ESS_l**3
         f3=np.pi/self.ESS_P
-        f4=x1-x2
+        f4=np.abs(x1-x2)
         f5=self.ESS_l**2
         return ((f1/f2)*np.sin(f3*f4)**2) * np.exp((-2/f5)*np.sin(f3*f4)**2)
       
@@ -123,16 +123,17 @@ class ExpSineSquared(Kernel):
         f2=self.ESS_l**2                #l**2
         f3=np.pi/self.ESS_P             #pi/P
         f4=self.ESS_P**2                #P**2
-        f5=x1-x2                        #x1-x2
+        f5=np.abs(x2-x1)           #x1-x2 ou x2-x1
+        #f5=np.absolute(x1-x2)
         return (f1*f5)/(f2*f4)* np.cos(f3*f5)*np.sin(f3*f5)* np.exp((-2.0/f2)*np.sin(f3*f5)**2) 
 
       
 class RatQuadratic(Kernel):
-    def __init__(self, RQ_theta, RQ_l, RQ_alpha):
-        super(RatQuadratic, self).__init__(RQ_theta, RQ_l, RQ_alpha)
+    def __init__(self, RQ_theta, RQ_alpha, RQ_l):
+        super(RatQuadratic, self).__init__(RQ_theta, RQ_alpha, RQ_l)
         self.RQ_theta = RQ_theta
-        self.RQ_l = RQ_l
         self.RQ_alpha = RQ_alpha
+        self.RQ_l = RQ_l
     
     def __call__(self, x1, x2):
         f1 = self.RQ_theta**2
