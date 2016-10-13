@@ -86,9 +86,8 @@ lk.likelihood(kernel3, x3, x3, y3, yerr3)
 lk.gradient_likelihood(kernel3, x3, x3, y3, yerr3)
 
 # Calculation using george
-start = time()  
 kernelg3 = 19.0**2*ge.ExpSquaredKernel(2.0**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.0**2,10.0)
 gp = george.GP(kernelg3)
 gp.compute(x3,yerr3)
-print 'Took %f seconds' % (time() - start), ('log_p_george',gp.lnlikelihood(y3))
+print 'likelihood_george ->',  gp.lnlikelihood(y3)
 print 'gradient_george ->', gp.grad_lnlikelihood(y3)
