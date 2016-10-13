@@ -67,7 +67,11 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad1=grad_logp(kernel.dRQ_dtheta,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dRQ_dalpha,x,xcalc,y,yerr,cov_matrix)
         grad3=grad_logp(kernel.dRQ_dl,x,xcalc,y,yerr,cov_matrix)
-        print 'gradient ->', grad1, grad2, grad3    
+        print 'gradient ->', grad1, grad2, grad3
+    elif isinstance(kernel,kl.Exponential):
+        grad1=grad_logp(kernel.dExp_dtheta,x,xcalc,y,yerr,cov_matrix)
+        grad2=grad_logp(kernel.dExp_dl,x,xcalc,y,yerr,cov_matrix)
+        print 'gradient ->', grad1, grad2    
 #    elif isinstance(kernel,Sum) is True:
 #        initial=kernel.__dict__
 #        for i in range(len(initial)):
@@ -75,7 +79,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
 #            print 'gradient -> Olha olha é uma soma com', cond_i 
 #    
     else:
-        print 'gradient -> We dont need no calculation \nWe dont need no optimization control'    
+        print 'gradient -> We dont need no calculation  \n            We dont need no optimization control'    
     #   Nao apliquei a mesma logica às kernels exponential e matern pois
     #até isto funcionar como deve ser não vale a pena fazer
     #funcionar como deve ser = saber se estou a calcular o gradiente bem

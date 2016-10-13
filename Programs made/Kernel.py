@@ -168,16 +168,18 @@ class RatQuadratic(Kernel):
         return f1*(func1 - np.log(func0)) * func0**(-f3)        
     
         
-class WhiteNoise(Kernel):                             #In case the white noise
-    def __init__(self,WN_theta):                      #is proved to be wrong
-        super(WhiteNoise,self).__init__(WN_theta)     #it will be necessary
-        self.WN_theta=WN_theta                        #to remove i and j from
-                                                      #all classes __call__
+class WhiteNoise(Kernel):                             
+    def __init__(self,WN_theta):                     
+        super(WhiteNoise,self).__init__(WN_theta)     
+        self.WN_theta=WN_theta                        
+                                                      
     def __call__(self, x1, x2):
-        f1=self.WN_theta**2                           #É extremamente lento
+        f1=self.WN_theta**2                           
         #f2=(x1-x2)     
         #f3=kd(i,j)
-        return f1*np.diag(np.ones_like(x1))
+        f4=np.diag(np.ones_like(x1))
+        return f1*f4 #Nao funciona, é preciso rever!
+        
 
 class Exponential(Kernel): #Matern 1/2 = Exponential
     def __init__(self,Exp_theta,Exp_l):
@@ -190,6 +192,21 @@ class Exponential(Kernel): #Matern 1/2 = Exponential
         f2=self.Exp_l
         f3=self.Exp_theta**2
         return f3*np.exp(-f1/f2)
+
+    def dExp_dtheta(self,x1,x2):
+        f1=self.Exp_theta     #theta
+        f2=(x1-x2)            #(x1-x2)**2
+        f3=self.Exp_l         #l
+        return 2*f1*np.exp(-f2/f3)        
+        #return f1**2*np.exp(-f2/f3)
+        
+    def dExp_dl(self,x1,x2):
+        f1=self.Exp_theta**2     #theta**2
+        f2=(x1-x2)              #(x1-x2)
+        f3=self.Exp_l           #l
+        f4=self.Exp_l**2        #l**2
+        return (f1*f2/f4)*np.exp(-f2/f3)
+    
 
 class Matern_32(Kernel): #Matern 3/2
     def __init__(self,M32_theta,M32_l):
