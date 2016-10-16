@@ -122,7 +122,8 @@ class ExpSineSquared(Kernel):
         f1=4*np.pi*self.ESS_theta**2    #4pi*theta**2
         f2=self.ESS_l**2                #l**2
         f3=np.pi/self.ESS_P             #pi/P
-        f4=self.ESS_P**2                #P**2
+        f4=self.ESS_P        
+        #f4=self.ESS_P**2                #P**2
         f5=np.abs(x2-x1)           #x1-x2 ou x2-x1
         #f5=np.absolute(x1-x2)
         return (f1*f5)/(f2*f4)* np.cos(f3*f5)*np.sin(f3*f5)* np.exp((-2.0/f2)*np.sin(f3*f5)**2) 
@@ -157,6 +158,7 @@ class RatQuadratic(Kernel):
         f4=self.RQ_l**2         #l**2
         f5=self.RQ_l**3         #l**3
         return (f1*f2/f5)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
+        #return (0.5*f1)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
         
     def dRQ_dalpha(self,x1,x2):
         f1=self.RQ_theta**2     #theta**2
