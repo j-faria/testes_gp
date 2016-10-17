@@ -77,9 +77,8 @@ class ExpSquared(Kernel):
         f1=self.ES_theta    #theta        
         f2=self.ES_l**2     #l**2
         f3=(x1-x2)**2       #(x1-x2)**2
-        return  f1**2 * np.exp(-0.5 * f3/f2)    #Rever o que fazem no george
-        #return  2*f1  * np.exp(-0.5*f3/f2)     #para decidir qual return usar    
-        
+        return  f1**2 * np.exp(-0.5 * f3/f2)    
+
     def dES_dl(self, x1, x2):
         f1=self.ES_theta**2     #theta**2
         f2=self.ES_l**2         #l**2
@@ -121,11 +120,9 @@ class ExpSineSquared(Kernel):
     def dESS_dP(self,x1,x2):
         f1=4*np.pi*self.ESS_theta**2    #4pi*theta**2
         f2=self.ESS_l**2                #l**2
-        f3=np.pi/self.ESS_P             #pi/P
-        f4=self.ESS_P        
-        #f4=self.ESS_P**2                #P**2
-        f5=np.abs(x2-x1)           #x1-x2 ou x2-x1
-        #f5=np.absolute(x1-x2)
+        f3=np.pi/self.ESS_P             #pi/P      
+        f4=self.ESS_P**2                #P**2
+        f5=np.abs(x1-x2)                #x1-x2 ou x2-x1
         return (f1*f5)/(f2*f4)* np.cos(f3*f5)*np.sin(f3*f5)* np.exp((-2.0/f2)*np.sin(f3*f5)**2) 
 
       
@@ -148,17 +145,16 @@ class RatQuadratic(Kernel):
         f2=(x1-x2)**2       #(x1-x2)**2
         f3=self.RQ_alpha    #alpha
         f4=self.RQ_l**2     #l**2
-#        return 2*f1*(1.0 + f2/(2.0*f3*f4))**(-f3)
         return f1**2*(1.0 + f2/(2.0*f3*f4))**(-f3)
  
     def dRQ_dl(self,x1,x2):
         f1=self.RQ_theta**2     #theta**2
         f2=(x1-x2)**2           #(x1-x2)**2
+        #f2=np.sqrt(x1**2 + x2**2)        
         f3=self.RQ_alpha        #alpha
         f4=self.RQ_l**2         #l**2
         f5=self.RQ_l**3         #l**3
         return (f1*f2/f5)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
-        #return (0.5*f1)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
         
     def dRQ_dalpha(self,x1,x2):
         f1=self.RQ_theta**2     #theta**2
