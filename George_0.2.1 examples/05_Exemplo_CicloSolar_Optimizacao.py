@@ -85,8 +85,8 @@ results = op.minimize(nll, p0, jac=grad_nll)
 
 # Update the kernel and print the final log-likelihood.
 gp.kernel[:] = results.x
-print(gp.lnlikelihood(y))
-print(kernel) #kernel final
+print('likelihoo:',gp.lnlikelihood(y))
+print('kernel:',kernel) #kernel final
 
 ########## PARTE GRAFICA ##########
     #Compute the predicted values of the function at a fine grid of points 
