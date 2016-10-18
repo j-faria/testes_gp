@@ -1,3 +1,18 @@
+			18/10/2016
+
+- Foi tentado calcular os gredientes de somas, dá
+valores errados mas pelo menos o python corre sem que 
+devolva erros.
+
+			17/10/2016
+
+- Os gradiente são diferentes do george mas acho que
+faz sentido até pois as minhas variaveis estao 
+definidas de maneira diferente 
+
+- Foi feita uma maneira de obter resultados iguais
+ao george e estão na pasta Likelihood/Cheat_attempt
+
 			11/10/2016
 
 - Falta olhar com atenção às kernels do george e ver
