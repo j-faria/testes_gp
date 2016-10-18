@@ -47,6 +47,9 @@ class Sum(_operator): #sum of kernels
     def __call__(self, x1, x2):
         return self.k1(x1, x2) + self.k2(x1, x2)
 
+    def parSize(self):
+        return self.pars.size
+        
     #def dcall(self, parnum ...)
         #self.pars.size numero de param da soma
 
