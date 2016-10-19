@@ -16,7 +16,6 @@ def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations
         x1 = x[i]
         for j in range(len(xcalc)):                      
             x2 = xcalc[j]
-
             K[i,j] = kernel(x1, x2)
     K=K+yerr**2*np.identity(len(x))      
     log_p_correct = lnlike(K, y)
@@ -35,19 +34,28 @@ def lnlike(K, r): #log-likelihood calculations
 
 ##### LIKELIHOOD GRADIENT
 def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
+#    from scipy.linalg import cho_factor
     K_grad = np.zeros((len(x),len(x))) 
     for i in range(len(x)):
         x1 = x[i]
         for j in range(len(xcalc)):                      
             x2 = xcalc[j]
             K_grad[i,j] = kernel(x1, x2)
+    K_grad=K_grad
+    #print K_grad
     K_inv = np.linalg.inv(cov_matrix)    
     alpha = np.dot(K_inv,y)
-    alpha_trans = alpha.T
+    
+    
+#    A = np.outer(alpha, alpha) - K_inv #isto vem do george
+#    grad_george = 0.5 * np.einsum('ij,ij', K_grad, A) #isto vem do george
+#    return grad_george
+    
 #formula do gradiente tiradas do Rasmussen&Williams chapter 5, equaçao(5.9)
     grad = 0.5 * np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
-            -0.5 * np.einsum('ij,ij',K_inv,K_grad)   
+            -0.5 *np.trace(np.dot(K_inv,K_grad))             
     return grad
+
 
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
     import inspect

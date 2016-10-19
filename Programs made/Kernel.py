@@ -256,9 +256,9 @@ class  ExpSineGeorge(Kernel):
         f2=self.P
         f3=x1-x2
         f4 = -np.sin(np.pi*f3/f2)**2
-        f5 = np.exp(-f1*np.sin(np.pi*f3/f2)**2)
-        return f4*f5 
-       
+        f5 = np.exp(-f1*np.sin(np.pi*f3/f2)**2)  
+        return f4*f5
+        
     def dE_dP(self,x1,x2):
         f1=self.gamma
         f2=self.P
@@ -266,4 +266,4 @@ class  ExpSineGeorge(Kernel):
         f4 = np.sin(np.pi*f3/f2)
         f5 = np.cos(np.pi*f3/f2)
         f6 = np.exp(-f1 *  np.sin(np.pi*f3/f2)**2)
-        return 2*f1*(np.pi*f3/f2)*f4*f5*f6/f2
+        return 2*f1*(np.pi*f3/f2)*f4*f5*f6/f2 
