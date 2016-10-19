@@ -47,16 +47,21 @@ y2 = np.sin(x2) + yerr2 * np.random.randn(len(x2))
 
 
 print  '### exemplo igual ao george'
-kernel=kl.ExpSineGeorge(2.0/1.0**2,5.0)
+kernel=kl.ExpSineGeorge(2.0/1.0**2,6.0)
 lk.likelihood(kernel, x2, x2, y2, yerr2)
 lk.gradient_likelihood(kernel, x2, x2, y2, yerr2)
 # Calculation using george
-kernelgeo = ge.ExpSine2Kernel(2.0/1.0**2,5.0)
+kernelgeo = ge.ExpSine2Kernel(2.0/1.0**2,6.0)
 gp = george.GP(kernelgeo)
 gp.compute(x2,yerr2)
 print 'likelihood_george ->', gp.lnlikelihood(y2)
 print 'gradient_george ->', gp.grad_lnlikelihood(y2)
 print 'acho que devia dar tudo igual, não dá'
+
+#xx1,_ = gp.parse_samples(x2)
+#print gp.kernel.gradient(xx1).shape
+#print gp.kernel.gradient(xx1)[:,:,0]
+#print gp.kernel.gradient(xx1)[:,:,1]
 
 
 ## Calculation using our stuff
