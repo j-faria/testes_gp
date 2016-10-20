@@ -80,7 +80,7 @@ class ExpSquared(Kernel):
         f1=self.ES_theta    #theta        
         f2=self.ES_l**2     #l**2
         f3=(x1-x2)**2       #(x1-x2)**2
-        return  f1**2 * np.exp(-0.5 * f3/f2)    
+        return  2*f1 * np.exp(-0.5 * f3/f2)
 
     def dES_dl(self, x1, x2):
         f1=self.ES_theta**2     #theta**2
@@ -257,7 +257,7 @@ class  ExpSineGeorge(Kernel):
         f3=x1-x2
         f4 = -np.sin(np.pi*f3/f2)**2
         f5 = np.exp(-f1*np.sin(np.pi*f3/f2)**2)  
-        return f4*f5
+        return f4*f5 *f1
         
     def dE_dP(self,x1,x2):
         f1=self.gamma
@@ -266,4 +266,4 @@ class  ExpSineGeorge(Kernel):
         f4 = np.sin(np.pi*f3/f2)
         f5 = np.cos(np.pi*f3/f2)
         f6 = np.exp(-f1 *  np.sin(np.pi*f3/f2)**2)
-        return 2*f1*(np.pi*f3/f2)*f4*f5*f6/f2 
+        return 2*f1*(np.pi*f3/f2)*f4*f5*f6/f2 *f2 
