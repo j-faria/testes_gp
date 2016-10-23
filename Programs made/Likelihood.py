@@ -34,7 +34,6 @@ def lnlike(K, r): #log-likelihood calculations
 
 ##### LIKELIHOOD GRADIENT
 def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
-#    from scipy.linalg import cho_factor
     K_grad = np.zeros((len(x),len(x))) 
     for i in range(len(x)):
         x1 = x[i]
@@ -42,7 +41,7 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
             x2 = xcalc[j]
             K_grad[i,j] = kernel(x1, x2)
     K_grad=K_grad
-    print K_grad
+#    print K_grad
     K_inv = np.linalg.inv(cov_matrix)    
     alpha = np.dot(K_inv,y)
     
