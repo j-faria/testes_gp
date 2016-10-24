@@ -84,10 +84,10 @@ class ExpSquared(Kernel):
 
     def dES_dl(self, x1, x2):
         f1=self.ES_theta**2     #theta**2
-        f2=self.ES_l**2         #l**2
+        f2=self.ES_l            #l
         f3=(x1-x2)**2           #(x1-x2)**2
         f4=self.ES_l**3         #l**3
-        return f1 * (f3/f4)*  np.exp(-0.5 * f3/f2)          
+        return f1 * (f3/f2**3)*  np.exp(-0.5 * f3/f2**2) 
    
      
 class ExpSineSquared(Kernel):
@@ -110,22 +110,23 @@ class ExpSineSquared(Kernel):
         f2 = self.ESS_l**2      #l**2 
         f3 = np.pi/self.ESS_P   #pi/P
         f4 = np.abs(x1-x2)
-        return f1**2*np.exp(-(2.0/f2)*np.sin(f3*f4)**2)  
+        return 2*f1*np.exp(-(2.0/f2)*np.sin(f3*f4)**2)  
     
     def dESS_dl(self,x1,x2):
-        f1=4* self.ESS_theta**2
+        f1=self.ESS_theta**2
         f2=self.ESS_l**3
         f3=np.pi/self.ESS_P
         f4=np.abs(x1-x2)
         f5=self.ESS_l**2
-        return ((f1/f2)*np.sin(f3*f4)**2) * np.exp((-2./f5)*np.sin(f3*f4)**2)
-      
+        f6=self.ESS_l
+        return (4*f1/f2) * (np.sin(f3*f4)**2) * np.exp((-2./f5)*np.sin(f3*f4)**2) 
+        
     def dESS_dP(self,x1,x2):
-        f1=self.ESS_theta**2    #4pi*theta**2
-        f2=self.ESS_l**2                #l**2
-        f3=np.pi/self.ESS_P             #pi/P      
-        f4=self.ESS_P                #P**2
-        f5=np.abs(x1-x2)                #x1-x2 ou x2-x1
+        f1=self.ESS_theta**2    #theta**2
+        f2=self.ESS_l**2        #l**2
+        f3=np.pi/self.ESS_P     #pi/P      
+        f4=self.ESS_P           #P
+        f5=np.abs(x1-x2)        #x1-x2 ou x2-x1
         return f1*2*(2./f2)*f3*f5* np.cos(f3*f5)*np.sin(f3*f5)* np.exp((-2.0/f2)*np.sin(f3*f5)**2)/f4 
 
       
@@ -252,18 +253,18 @@ class  ExpSineGeorge(Kernel):
         return np.exp(-f1 *  np.sin(np.pi*f3/f2)**2)
         
     def dE_dGamma(self,x1,x2):
-        f1=self.gamma
-        f2=self.P
-        f3=x1-x2
+        f1 = self.gamma
+        f2 = self.P
+        f3 = x1-x2
         f4 = -np.sin(np.pi*f3/f2)**2
         f5 = np.exp(-f1*np.sin(np.pi*f3/f2)**2)  
         return f4*f5 #*f1
         
     def dE_dP(self,x1,x2):
-        f1=self.gamma
-        f2=self.P
-        f3=x1-x2
+        f1 = self.gamma
+        f2 = self.P
+        f3 = x1-x2
         f4 = np.sin(np.pi*f3/f2)
         f5 = np.cos(np.pi*f3/f2)
         f6 = np.exp(-f1 *  np.sin(np.pi*f3/f2)**2)
-        return 2*f1*(np.pi*f3/f2)*f4*f5*f6/f2 #*f2 
+        return 2*f1*(np.pi*f3/f2)*f4*f5*(f6/f2) #*f2

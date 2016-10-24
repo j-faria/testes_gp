@@ -33,6 +33,17 @@ def lnlike(K, r): #log-likelihood calculations
     return logLike
 
 ##### LIKELIHOOD GRADIENT
+def likelihood_aux(kernel, x, xcalc, y, yerr): #covariance matrix calculations   
+    K = np.zeros((len(x),len(x))) #covariance matrix K
+    for i in range(len(x)):
+        x1 = x[i]
+        for j in range(len(xcalc)):                      
+            x2 = xcalc[j]
+            K[i,j] = kernel(x1, x2)
+    K=K+yerr**2*np.identity(len(x))      
+    log_p_correct = lnlike(K, y) 
+    return K
+
 def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
     K_grad = np.zeros((len(x),len(x))) 
     for i in range(len(x)):
@@ -40,7 +51,7 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
         for j in range(len(xcalc)):                      
             x2 = xcalc[j]
             K_grad[i,j] = kernel(x1, x2)
-    K_grad=K_grad
+#    K_grad=K_grad
 #    print K_grad
     K_inv = np.linalg.inv(cov_matrix)    
     alpha = np.dot(K_inv,y)
@@ -50,15 +61,9 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
     grad_george = 0.5 * np.einsum('ij,ij', K_grad, A) #isto vem do george
     return grad_george
     
-    #formula do gradiente tiradas do Rasmussen&Williams chapter 5, equaçao(5.9)
-    grad = 0.5 * np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
-            -0.5 *np.trace(np.dot(K_inv,K_grad))             
-    return grad
-
-
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
     import inspect
-    cov_matrix=likelihood(kernel,x,xcalc,y,yerr)#ele volta a imprimir a likelihood acho que 
+    cov_matrix=likelihood_aux(kernel,x,xcalc,y,yerr)#ele volta a imprimir a likelihood acho que 
                                                 #por causa disto mas preciso da matriz de 
                                                 #covariancia original
     if isinstance(kernel,kl.ExpSquared):
@@ -87,6 +92,9 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         grad1=grad_logp(kernel.dE_dGamma,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dE_dP,x,xcalc,y,yerr,cov_matrix) 
         print 'gradient ->', grad1, grad2
+    elif isinstance(kernel,kl.Sum):
+        gradient_sum(kernel,x,xcalc,y,yerr)
+        
     else:
         print 'gradient -> We dont need no calculation  \n            We dont need no optimization control'    
     #   Nao apliquei a mesma logica às kernels exponential e matern pois
@@ -94,19 +102,25 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
     #funcionar como deve ser = saber se estou a calcular o gradiente bem
     #e arranjar maneira de isto funcionar com somas e multiplicaçoes de kernels
       
-#def gradient_sum(kernel,x,xcalc,y,yerr):
+def gradient_sum(kernel,x,xcalc,y,yerr):
+    print "It is a work in progress"
+#    from numpy import arange
 #    #a0=kernel.parSize()
 #    a=kernel.__dict__
 #    grad_result=[]    
-#    for i in range(len(kernel.__dict__)):
-##        inv_map = {v: k for k, v in a.iteritems()}
-##        print a, inv_map
-#        k_i = a.popitem(); k_i = k_i[1]
+#    for i in arange(1,len(kernel.__dict__)+1):
+#        #inv_map = {v: k for k, v in a.iteritems()}
+#        #print a, inv_map
+#        #k_i = a.popitem();
+#        var = "k%i" %i
+#        k_i = a[var]
+#        print var, k_i
 #        calc = gradient_likelihood(k_i,x,xcalc,y,yerr)
+#        #print  calc
 #        grad_result.insert(0,calc)
 #        grad_final  =[]
-#        for j in range(len(grad_result)):        
-#            grad_final = grad_final + list(grad_result[j])
+#        for j in range(len(grad_result)):         
+#           grad_final = grad_final + list(grad_result[j])
 #    print 'gradient sum ->', grad_final
 #    return grad_final
 ##Devolve NoneType, rever!
