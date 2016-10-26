@@ -40,23 +40,23 @@ import george.kernels as ge
 #print gp.kernel.gradient(xx1)[:,:,0]
 ###############################################################################
 
-### EXEMPLO 2 - ExpSineSquared
-#np.random.seed(1001)
-#x2 = 10 * np.sort(np.random.rand(102))
-#yerr2 = 0.2 * np.ones_like(x2)
-#y2 = np.sin(x2) + yerr2 * np.random.randn(len(x2))
-#
-#print  '########## EXEMPLO IGUAL AO GEORGE ##########'
-#kernel=kl.ExpSineGeorge(2.0/1.1**2,7.0)
-#lk.likelihood(kernel, x2, x2, y2, yerr2)
-#lk.gradient_likelihood(kernel, x2, x2, y2, yerr2)
-## Calculation using george
-#kernelgeo = ge.ExpSine2Kernel(2.0/1.1**2,7.0)
-#gp = george.GP(kernelgeo)
-#gp.compute(x2,yerr2)
-#print 'likelihood_george ->', gp.lnlikelihood(y2)
-#print 'gradient_george ->', gp.grad_lnlikelihood(y2)
-##print 'acho que devia dar tudo igual, não dá'
+## EXEMPLO 2 - ExpSineSquared
+np.random.seed(1001)
+x2 = 10 * np.sort(np.random.rand(102))
+yerr2 = 0.2 * np.ones_like(x2)
+y2 = np.sin(x2) + yerr2 * np.random.randn(len(x2))
+
+print  '########## EXEMPLO IGUAL AO GEORGE ##########'
+kernel=kl.ExpSineGeorge(2.0/1.23**2, 7.1)
+lk.likelihood(kernel, x2, x2, y2, yerr2)
+lk.gradient_likelihood(kernel, x2, x2, y2, yerr2)
+# Calculation using george
+kernelgeo = ge.ExpSine2Kernel(2.0/1.23**2, 7.1)
+gp = george.GP(kernelgeo)
+gp.compute(x2,yerr2)
+print 'likelihood_george ->', gp.lnlikelihood(y2)
+print 'gradient_george ->', gp.grad_lnlikelihood(y2)
+#print 'acho que devia dar tudo igual, não dá'
 
 
 #xx2,_ = gp.parse_samples(x2)
@@ -69,7 +69,7 @@ import george.kernels as ge
 #print '########## EXPSINESQUARED'
 #kernel2=kl.ExpSineSquared(15.0, 2.0, 10.0)
 #lk.likelihood(kernel2, x2, x2, y2, yerr2)
-#lk.gradient_likelihood(kernel2, x2, x2, y2, yerr2)
+#print 'gradient ->', lk.gradient_likelihood(kernel2, x2, x2, y2, yerr2)
 #
 ## Calculation using george
 #kernelg2 = 15.0**2*ge.ExpSine2Kernel(2.0/2.0**2,10.0)
@@ -98,19 +98,19 @@ import george.kernels as ge
 #print 'gradient_george ->', gp.grad_lnlikelihood(y3)
 ###############################################################################
 
-### EXEMPLO 10 - ExpSquared + ExpSineSquared
-x1 = 10 * np.sort(np.random.rand(103))
-yerr1 = 0.2 * np.ones_like(x1)
-y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
-
-print '########## SOMA ##########'
-kernel3=kl.ExpSquared(19.0, 2.0) * kl.ExpSineSquared(15.0, 1.0, 10.0) 
-lk.likelihood(kernel3, x1, x1, y1, yerr1)
-lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
-
-# Calculation using george
-kernelg3 = 19.0**2*ge.ExpSquaredKernel(2.0**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.0**2,10.0)
-gp = george.GP(kernelg3)
-gp.compute(x1,yerr1)
-print 'likelihood_george ->',  gp.lnlikelihood(y1)
-print 'gradient_george ->', gp.grad_lnlikelihood(y1)
+#### EXEMPLO 10 - ExpSquared + ExpSineSquared
+#x1 = 10 * np.sort(np.random.rand(103))
+#yerr1 = 0.2 * np.ones_like(x1)
+#y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
+#
+#print '########## SOMA ##########'
+#kernel3=kl.ExpSquared(19.0, 2.0) + kl.ExpSineSquared(15.0, 1.0, 10.0) 
+#lk.likelihood(kernel3, x1, x1, y1, yerr1)
+#lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
+#
+## Calculation using george
+#kernelg3 = 19.0**2*ge.ExpSquaredKernel(2.0**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.0**2,10.0)
+#gp = george.GP(kernelg3)
+#gp.compute(x1,yerr1)
+#print 'likelihood_george ->',  gp.lnlikelihood(y1)
+#print 'gradient_george ->', gp.grad_lnlikelihood(y1)
