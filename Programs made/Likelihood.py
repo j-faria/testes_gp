@@ -46,23 +46,26 @@ def likelihood_aux(kernel, x, xcalc, y, yerr): #covariance matrix calculations
     log_p_correct = lnlike(K, y) 
     return K
 
-def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix):
-    K_grad = np.zeros((len(x),len(x))) 
+def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix): #covariance matrix of derivatives
+    K_grad = np.zeros((len(x),len(x)))  #covariance matrix K_grad
     for i in range(len(x)):
         x1 = x[i]
         for j in range(len(xcalc)):                      
             x2 = xcalc[j]
             K_grad[i,j] = kernel(x1, x2)
-#    K_grad=K_grad
-#    print K_grad
     K_inv = np.linalg.inv(cov_matrix)    
     alpha = np.dot(K_inv,y)
     
-    #codigo tirado do george
-    A = np.outer(alpha, alpha) - K_inv #isto vem do george
-    grad_george = 0.5 * np.einsum('ij,ij', K_grad, A) #isto vem do george
+    #code used in george
+    A = np.outer(alpha, alpha) - K_inv #this comes from george
+    grad_george = 0.5 * np.einsum('ij,ij', K_grad, A) #this comes from george
     return grad_george
-    
+ 
+#    #formula of the gradient from do Rasmussen&Williams chapter 5, eq.(5.9)
+#    grad = 0.5 * np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
+#            -0.5 * np.einsum('ij,ij',K_inv,K_grad)   
+#    return grad
+   
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
     import inspect
     cov_matrix=likelihood_aux(kernel,x,xcalc,y,yerr)
@@ -98,15 +101,14 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         gradient_mul(kernel,x,xcalc,y,yerr)
                 
     else:
-        print 'gradient -> We dont need no calculation  \n            We dont need no optimization control'    
+        print 'gradient -> NOPE'    
     #   Nao apliquei a mesma logica às kernels exponential e matern pois
     #até isto funcionar como deve ser não vale a pena fazer
     #funcionar como deve ser = saber se estou a calcular o gradiente bem
     #e arranjar maneira de isto funcionar com somas e multiplicaçoes de kernels
 
  
-##### LIKELIHOOD GRADIENT FOR SUMS
-#EM TESTES - IGNORAR POR ENQUANTO     
+##### LIKELIHOOD GRADIENT FOR SUMS -- IN TESTS IGNORE FOR NOW      
 def gradient_sum(kernel,x,xcalc,y,yerr):
     print 'Work in progress'
     from numpy import arange
@@ -162,12 +164,10 @@ def gradient_likelihoodAUX(kernel,x,xcalc,y,yerr,kernelOriginal):
 #        gradient_mul(kernel,x,xcalc,y,yerr)
                 
     else:
-        print 'gradient -> We dont need no calculation'    
-        print '            We dont need no optimization control'
+        print 'gradient -> NOPE'
 
 
-##### LIKELIHOOD GRADIENT FOR PRODUCTS
-#EM TESTES - IGNORAR POR ENQUANTO         
+##### LIKELIHOOD GRADIENT FOR PRODUCTS -- IN TESTS IGNORE FOR NOW        
 def gradient_mul(kernel,x,xcalc,y,yerr):
     print 'Work in progress'
     from numpy import arange

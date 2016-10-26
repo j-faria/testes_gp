@@ -239,7 +239,7 @@ class Matern_52(Kernel): #Matern 5/2
     #def dcall(self,...):
     #    return #a expressao da derivada
     
-#Igual a kernel do george ExpSine2Kernel
+### This kernel is equal to george's ExpSine2Kernel
 class  ExpSineGeorge(Kernel):
     def __init__(self,gamma,P):
         super(ExpSineGeorge,self).__init__(gamma,P)
