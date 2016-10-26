@@ -114,3 +114,21 @@ print 'gradient_george ->', gp.grad_lnlikelihood(y2)
 #gp.compute(x1,yerr1)
 #print 'likelihood_george ->',  gp.lnlikelihood(y1)
 #print 'gradient_george ->', gp.grad_lnlikelihood(y1)
+###############################################################################
+
+### EXEMPLO 11 - ExpSquared * ExpSineSquared
+x1 = 10 * np.sort(np.random.rand(103))
+yerr1 = 0.2 * np.ones_like(x1)
+y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
+
+print '########## MULTIPLICACAO ##########'
+kernel3=kl.ExpSquared(19.0, 2.0) * kl.ExpSineSquared(15.0, 1.0, 10.0) 
+lk.likelihood(kernel3, x1, x1, y1, yerr1)
+lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
+
+## Calculation using george
+#kernelg3 = 19.0**2*ge.ExpSquaredKernel(2.0**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.0**2,10.0)
+#gp = george.GP(kernelg3)
+#gp.compute(x1,yerr1)
+#print 'likelihood_george ->',  gp.lnlikelihood(y1)
+#print 'gradient_george ->', gp.grad_lnlikelihood(y1)

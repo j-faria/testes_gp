@@ -176,6 +176,5 @@ def gradient_mul(kernel,x,xcalc,y,yerr):
     for i in arange(1,len(kernel.__dict__)+1):
         var = "k%i" %i
         k_i = a[var]
-        print k_i        
-        var = "k%i" %i
-        k_i = a[var]          
+        print i, k_i
+    print k_1   
