@@ -116,7 +116,6 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
         print 'gradient -> NOPE'    
 
 
- 
 ##### LIKELIHOOD GRADIENT FOR SUMS -- SEEMS TO WORK      
 def gradient_sum(kernel,x,xcalc,y,yerr):
     from numpy import arange
@@ -167,12 +166,7 @@ def gradient_likelihoodAUX(kernel,x,xcalc,y,yerr,kernelOriginal):
     elif isinstance(kernel,kl.ExpSineGeorge):
         grad1=grad_logp(kernel.dE_dGamma,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dE_dP,x,xcalc,y,yerr,cov_matrix) 
-        return grad1, grad2
-#    elif isinstance(kernel,kl.Sum):
-#        gradient_sum(kernel,x,xcalc,y,yerr)
-#    elif isinstance(kernel,kl.Product):
-#        gradient_mul(kernel,x,xcalc,y,yerr)
-                
+        return grad1, grad2                
     else:
         print 'gradient -> NOPE'
 
