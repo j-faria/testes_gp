@@ -77,17 +77,17 @@ class ExpSquared(Kernel):
         return f1 * np.exp(-0.5* f3/f2)
 
     def dES_dtheta(self, x1, x2):        
-        f1=self.ES_theta    #theta        
+        f1=self.ES_theta**2    #theta        
         f2=self.ES_l**2     #l**2
         f3=(x1-x2)**2       #(x1-x2)**2
-        return  2*f1 * np.exp(-0.5 * f3/f2)
+        return  2*f1*np.exp(-0.5*f3/f2)
 
     def dES_dl(self, x1, x2):
         f1=self.ES_theta**2     #theta**2
         f2=self.ES_l            #l
         f3=(x1-x2)**2           #(x1-x2)**2
         f4=self.ES_l**3         #l**3
-        return f1 * (f3/f2**3)*  np.exp(-0.5 * f3/f2**2) 
+        return f1*(f3/f4)*np.exp(-0.5*f3/f2**2) *f2#mult por l
    
      
 class ExpSineSquared(Kernel):
@@ -103,10 +103,10 @@ class ExpSineSquared(Kernel):
         f2 = self.ESS_l**2
         f3 = np.abs(x1-x2)
         f4 = self.ESS_P
-        return f1*np.exp((-2/f2)*((np.sin(np.pi*f3/f4))**2))     
+        return f1*np.exp((-2/f2)*((np.sin(np.pi*f3/f4))**2))   
       
     def dESS_dtheta(self,x1,x2):
-        f1 = self.ESS_theta     #theta
+        f1 = self.ESS_theta**2  #theta**2
         f2 = self.ESS_l**2      #l**2 
         f3 = np.pi/self.ESS_P   #pi/P
         f4 = np.abs(x1-x2)
@@ -119,7 +119,8 @@ class ExpSineSquared(Kernel):
         f4=np.abs(x1-x2)
         f5=self.ESS_l**2
         f6=self.ESS_l
-        return (4*f1/f2) * (np.sin(f3*f4)**2) * np.exp((-2./f5)*np.sin(f3*f4)**2) 
+        return (4*f1/f2)*(np.sin(f3*f4)**2)*np.exp((-2./f5)*np.sin(f3*f4)**2) \
+                *f6#mult por l 
         
     def dESS_dP(self,x1,x2):
         f1=self.ESS_theta**2    #theta**2
@@ -127,7 +128,8 @@ class ExpSineSquared(Kernel):
         f3=np.pi/self.ESS_P     #pi/P      
         f4=self.ESS_P           #P
         f5=np.abs(x1-x2)        #x1-x2 ou x2-x1
-        return f1*2*(2./f2)*f3*f5* np.cos(f3*f5)*np.sin(f3*f5)* np.exp((-2.0/f2)*np.sin(f3*f5)**2)/f4 
+        return f1*(4./f2)*f3*f5*np.cos(f3*f5)*np.sin(f3*f5) \
+                *np.exp((-2.0/f2)*np.sin(f3*f5)**2) 
 
       
 class RatQuadratic(Kernel):
@@ -139,26 +141,26 @@ class RatQuadratic(Kernel):
     
     def __call__(self, x1, x2):
         f1 = self.RQ_theta**2
+        f11 = self.RQ_theta
         f2 = self.RQ_l**2
         f3 = (x1-x2)**2
         f4 = self.RQ_alpha
         return f1*(1+(0.5*f3/(f4*f2)))**(-f4)
             
     def dRQ_dtheta(self,x1,x2):
-        f1=self.RQ_theta    #theta
-        f2=(x1-x2)**2       #(x1-x2)**2
-        f3=self.RQ_alpha    #alpha
-        f4=self.RQ_l**2     #l**2
-        return f1**2*(1.0 + f2/(2.0*f3*f4))**(-f3)
+        f1=self.RQ_theta**2     #theta**2
+        f2=(x1-x2)**2           #(x1-x2)**2
+        f3=self.RQ_alpha        #alpha
+        f4=self.RQ_l**2         #l**2
+        return 2*f1*(1.0 + f2/(2.0*f3*f4))**(-f3)
  
     def dRQ_dl(self,x1,x2):
         f1=self.RQ_theta**2     #theta**2
-        f2=(x1-x2)**2           #(x1-x2)**2
-        #f2=np.sqrt(x1**2 + x2**2)        
+        f2=(x1-x2)**2           #(x1-x2)**2     
         f3=self.RQ_alpha        #alpha
         f4=self.RQ_l**2         #l**2
-        f5=self.RQ_l**3         #l**3
-        return (f1*f2/f5)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
+        #f5=self.RQ_l**3         #l**3
+        return (f1*f2/f4)*(1.0 + f2/(2.0*f3*f4))**(-1.0-f3)
         
     def dRQ_dalpha(self,x1,x2):
         f1=self.RQ_theta**2     #theta**2
@@ -167,7 +169,7 @@ class RatQuadratic(Kernel):
         f4=self.RQ_l**2         #l**2
         func0=1.0 + f2/(2.0*f3*f4)
         func1=f2/(2.0*f3*f4*func0)
-        return f1*(func1 - np.log(func0)) * func0**(-f3)        
+        return f1*(func1-np.log(func0))*func0**(-f3) *f3       
     
         
 class WhiteNoise(Kernel):                             
@@ -196,18 +198,17 @@ class Exponential(Kernel): #Matern 1/2 = Exponential
         return f3*np.exp(-f1/f2)
 
     def dExp_dtheta(self,x1,x2):
-        f1=self.Exp_theta     #theta
+        f1=self.Exp_theta**2  #theta
         f2=(x1-x2)            #(x1-x2)**2
         f3=self.Exp_l         #l
         return 2*f1*np.exp(-f2/f3)        
-        #return f1**2*np.exp(-f2/f3)
         
     def dExp_dl(self,x1,x2):
-        f1=self.Exp_theta**2     #theta**2
+        f1=self.Exp_theta**2    #theta**2
         f2=(x1-x2)              #(x1-x2)
         f3=self.Exp_l           #l
         f4=self.Exp_l**2        #l**2
-        return (f1*f2/f4)*np.exp(-f2/f3)
+        return (f1*f2/f3)*np.exp(-f2/f3)
     
 
 class Matern_32(Kernel): #Matern 3/2
@@ -221,6 +222,21 @@ class Matern_32(Kernel): #Matern 3/2
         f2=self.M32_l
         f3=self.M32_theta**2
         return f3*(1.0 + f1/f2)*np.exp(-f1/f2)
+
+    def dM32_dtheta(self,x1,x2):
+        f1=self.M32_theta**2  #theta
+        f2=(x1-x2)            #(x1-x2)**2
+        f3=self.M32_l         #l
+        return 2*f1*(1+np.sqrt(3)/f3)*np.exp(-np.sqrt(3)*f2/f3)        
+        
+    def dM32_dl(self,x1,x2):
+        f1=self.M32_theta**2    #theta**2
+        f2=(x1-x2)              #(x1-x2)
+        f3=self.M32_l           #l
+        f4=self.M32_l**2        #l**2
+        return f1*np.sqrt(3)*f2*(1+np.sqrt(3)/f3)*np.exp(-np.sqrt(3)*f2/f3)/f4 \
+                - f1*np.sqrt(3)*np.exp(-np.sqrt(3)*f2/f3)/f4 
+
         
 class Matern_52(Kernel): #Matern 5/2
     def __init__(self,M52_l):
@@ -236,9 +252,25 @@ class Matern_52(Kernel): #Matern 5/2
         f5=self.M52_theta**2
         return f5*(1.0 + f1/f3 + (5.0*f4)/(3.0*f4))*np.exp(-f1/f3)
     
-    #def dcall(self,...):
-    #    return #a expressao da derivada
-    
+    def dM52_dtheta(self,x1,x2):
+        f1=self.M52_theta**2  #theta
+        f2=self.M52_l         #l
+        f3=self.M52_l**2      #l**2
+        f4=(x1-x2)            #(x1-x2)
+        f5=(x1-x2)**2         #(x1-x2)**2
+        return 2*f1*(1 + np.sqrt(5)*f4/f2 + (5.*f5)/(3*f3)) \
+                *np.exp(-np.sqrt(5)*f4/f2)
+         
+    def dM52_dl(self,x1,x2):
+        f1=self.M52_theta**2  #theta
+        f2=self.M52_l         #l
+        f3=self.M52_l**2      #l**2
+        f4=(x1-x2)            #(x1-x2)
+        f5=(x1-x2)**2         #(x1-x2)**2
+        return (f1/f3)*np.sqrt(5)*(1+np.sqrt(5)*f4/f2+(5.*f5)/(3*f3))*f4*np.exp(-np.sqrt(5)*f4/f2) \
+                + f1*(-np.sqrt(5)*f4/f3-(10.*f5)/(3*f2*f3))*np.exp(-np.sqrt(5)*f4/f2)
+                
+                
 ### This kernel is equal to george's ExpSine2Kernel
 class  ExpSineGeorge(Kernel):
     def __init__(self,gamma,P):
@@ -258,7 +290,7 @@ class  ExpSineGeorge(Kernel):
         f3 = x1-x2
         f4 = -np.sin(np.pi*f3/f2)**2
         f5 = np.exp(-f1*np.sin(np.pi*f3/f2)**2)  
-        return f4*f5 #*f1
+        return f4*f5*f1
         
     def dE_dP(self,x1,x2):
         f1 = self.gamma
@@ -267,4 +299,4 @@ class  ExpSineGeorge(Kernel):
         f4 = np.sin(np.pi*f3/f2)
         f5 = np.cos(np.pi*f3/f2)
         f6 = np.exp(-f1 *  np.sin(np.pi*f3/f2)**2)
-        return 2*f1*(np.pi*f3/f2)*f4*f5*(f6/f2) #*f2
+        return 2*f1*(np.pi*f3/f2)*f4*f5*(f6/f2)*f2
