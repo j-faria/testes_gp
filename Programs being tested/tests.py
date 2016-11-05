@@ -88,47 +88,64 @@ import george.kernels as ge
 #print 'gradient_george ->', gp.grad_lnlikelihood(y3)
 ###############################################################################
 
-### EXEMPLO 10 - ExpSquared + ExpSineSquared
+#### EXEMPLO 10 - ExpSquared + ExpSineSquared
+#x1 = 10 * np.sort(np.random.rand(103))
+#yerr1 = 0.2 * np.ones_like(x1)
+#y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
+#
+#print '########## SOMA ES+ESS ##########'
+#kernel3=kl.ExpSquared(19.1, 1.3) + kl.ExpSineSquared(15.0, 1.5, 11.0) 
+#lk.likelihood(kernel3, x1, x1, y1, yerr1)
+#lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
+#
+## Calculation using george
+#kernelg3 = 19.1**2*ge.ExpSquaredKernel(1.3**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.5**2,11.0)
+#gp = george.GP(kernelg3)
+#gp.compute(x1,yerr1)
+#print 'likelihood_george ->',  gp.lnlikelihood(y1)
+#print 'gradient_george ->', gp.grad_lnlikelihood(y1)
+###############################################################################
+
+#### EXEMPLO 11 - RatQuadratic + ExpSineSquared
+#x1 = 10 * np.sort(np.random.rand(103))
+#yerr1 = 0.2 * np.ones_like(x1)
+#y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
+#
+#print '########## Soma RQ+ESS ##########'
+#kernel3=kl.RatQuadratic(11.0,1.5,1.0) + kl.ExpSineSquared(15.0, 1.0, 10.0) 
+#lk.likelihood(kernel3, x1, x1, y1, yerr1)
+#lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
+#
+## Calculation using george
+#kernelg3 = 11.0**2*ge.RationalQuadraticKernel(1.5,1.0**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.0**2,10.0)
+#gp = george.GP(kernelg3)
+#gp.compute(x1,yerr1)
+#print 'likelihood_george ->',  gp.lnlikelihood(y1)
+#print 'gradient_george ->', gp.grad_lnlikelihood(y1)
+###############################################################################
+
+### EXEMPLO 12 - ExpSquared * ExpSineSquared
 x1 = 10 * np.sort(np.random.rand(103))
 yerr1 = 0.2 * np.ones_like(x1)
 y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
 
-print '########## SOMA ES+ESS ##########'
-kernel3=kl.ExpSquared(19.1, 1.3) + kl.ExpSineSquared(15.0, 1.5, 11.0) 
+print '########## MULTIPLICACAO ES*ESS ##########'
+kernel3=kl.ExpSquared(19.1, 1.3) * kl.ExpSineSquared(15.0, 1.5, 11.0) 
 lk.likelihood(kernel3, x1, x1, y1, yerr1)
 lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
 
 # Calculation using george
-kernelg3 = 19.1**2*ge.ExpSquaredKernel(1.3**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.5**2,11.0)
+kernelg3 = 19.1**2*ge.ExpSquaredKernel(1.3**2) * 15.0**2*ge.ExpSine2Kernel(2.0/1.5**2,11.0)
 gp = george.GP(kernelg3)
 gp.compute(x1,yerr1)
 print 'likelihood_george ->',  gp.lnlikelihood(y1)
 print 'gradient_george ->', gp.grad_lnlikelihood(y1)
-###############################################################################
-
-### EXEMPLO 11 - RatQuadratic + ExpSineSquared
-x1 = 10 * np.sort(np.random.rand(103))
-yerr1 = 0.2 * np.ones_like(x1)
-y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
-
-print '########## Soma RQ+ESS ##########'
-kernel3=kl.RatQuadratic(11.0,1.5,1.0) + kl.ExpSineSquared(15.0, 1.0, 10.0) 
-lk.likelihood(kernel3, x1, x1, y1, yerr1)
-lk.gradient_likelihood(kernel3, x1, x1, y1, yerr1)
-
-# Calculation using george
-kernelg3 = 11.0**2*ge.RationalQuadraticKernel(1.5,1.0**2) + 15.0**2*ge.ExpSine2Kernel(2.0/1.0**2,10.0)
-gp = george.GP(kernelg3)
-gp.compute(x1,yerr1)
-print 'likelihood_george ->',  gp.lnlikelihood(y1)
-print 'gradient_george ->', gp.grad_lnlikelihood(y1)
-###############################################################################
 
 ##Devolve a matrix do gradiente no george
 #xx1,_ = gp.parse_samples(x1)
 #print gp.kernel.gradient(xx1).shape
 #print gp.kernel.gradient(xx1)[:,:,0]
-#
+
 #xx2,_ = gp.parse_samples(x2)
 #print gp.kernel.gradient(xx2).shape
 #print gp.kernel.gradient(xx2)[:,:,0]
