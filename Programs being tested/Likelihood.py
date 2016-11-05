@@ -179,11 +179,13 @@ def gradient_mul(kernel,x,xcalc,y,yerr):
     a=kernel.__dict__; len_dict=len(kernel.__dict__)
     grad_result=[]; kernel_result=[]
     for i in arange(1,len_dict+1):
-        var = "k%i" %i; ki = a[var]
+        var = "k%i"%i; ki = a[var]
         Ai=[]; Ai.insert(1,ki)
         #kernel_result.insert(1,ki)
         #print i, ki
         print 'A%i ='%i, Ai
+        ai=[]; ai.insert(1,kernel_identify(ki))
+        print 'a%i ='%i, ai
     #print kernel_result
     #for i in range(len_dict):
         #calc = gradient_likelihood_mult(kernel_result[i],x,xcalc,y,yerr,kernelOriginal)
@@ -191,38 +193,14 @@ def gradient_mul(kernel,x,xcalc,y,yerr):
                 
                 
                 
-def gradient_likelihood_mult(kernel,x,xcalc,y,yerr,kernelOriginal):
+def kernel_identify(kernel):
     import inspect
-    cov_matrix=likelihood_aux(kernelOriginal,x,xcalc,y,yerr)
     if isinstance(kernel,kl.ExpSquared):
-        grad1=grad_logp(kernel.dES_dtheta, x, xcalc, y, yerr, cov_matrix)
-        grad2=grad_logp(kernel.dES_dl, x, xcalc, y, yerr, cov_matrix)
-        return grad1, grad2
+        der1= kernel.dES_dtheta
+        der2= kernel.dES_dl
+        return der1, der2
+        #return kernel.dES_dtheta, kernel.dES_dl
     elif isinstance(kernel,kl.ExpSineSquared):
-        grad1=grad_logp(kernel.dESS_dtheta,x,xcalc,y,yerr,cov_matrix)
-        grad2=grad_logp(kernel.dESS_dl,x,xcalc,y,yerr,cov_matrix)
-        grad3=grad_logp(kernel.dESS_dP,x,xcalc,y,yerr,cov_matrix)
-        return grad1, grad2, grad3 
-    elif isinstance(kernel,kl.RatQuadratic):
-        grad1=grad_logp(kernel.dRQ_dtheta,x,xcalc,y,yerr,cov_matrix)
-        grad2=grad_logp(kernel.dRQ_dalpha,x,xcalc,y,yerr,cov_matrix)
-        grad3=grad_logp(kernel.dRQ_dl,x,xcalc,y,yerr,cov_matrix)
-        return grad1, grad2, grad3 
-    elif isinstance(kernel,kl.Exponential):
-        grad1=grad_logp(kernel.dExp_dtheta,x,xcalc,y,yerr,cov_matrix)
-        grad2=grad_logp(kernel.dExp_dl,x,xcalc,y,yerr,cov_matrix)
-        return grad1, grad2
-    elif isinstance(kernel,kl.Matern_32):
-        grad1=grad_logp(kernel.dM32_dtheta,x,xcalc,y,yerr,cov_matrix)
-        grad2=grad_logp(kernel.dM32_dl,x,xcalc,y,yerr,cov_matrix)
-        return grad1, grad2
-    elif isinstance(kernel,kl.Matern_52):
-        grad1=grad_logp(kernel.dM52_dtheta,x,xcalc,y,yerr,cov_matrix)
-        grad2=grad_logp(kernel.dM52_dl,x,xcalc,y,yerr,cov_matrix)
-        return grad1, grad2
-    elif isinstance(kernel,kl.ExpSineGeorge):
-        grad1=grad_logp(kernel.dE_dGamma,x,xcalc,y,yerr,cov_matrix)
-        grad2=grad_logp(kernel.dE_dP,x,xcalc,y,yerr,cov_matrix) 
-        return grad1, grad2                
+        return kernel.dESS_dtheta, kernel.dESS_dl, kernel.dESS_dP
     else:
-        print 'gradient -> NOPE'
+        print 'GO HOME! YOU ARE DRUNK'
