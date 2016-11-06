@@ -55,17 +55,10 @@ def grad_logp(kernel,x,xcalc,y,yerr,cov_matrix): #covariance matrix of derivativ
             K_grad[i,j] = kernel(x1, x2)
     K_inv = np.linalg.inv(cov_matrix)    
     alpha = np.dot(K_inv,y)
-    
-    #code used in george
     A = np.outer(alpha, alpha) - K_inv #this comes from george
     grad_george = 0.5 * np.einsum('ij,ij', K_grad, A) #this comes from george
-    return grad_george
- 
-#    #formula of the gradient from do Rasmussen&Williams chapter 5, eq.(5.9)
-#    grad = 0.5 * np.dot(y.T,np.dot(K_inv,np.dot(K_grad,np.dot(K_inv,y)))) \
-#            -0.5 * np.einsum('ij,ij',K_inv,K_grad)   
-#    return grad
-   
+    return grad_george 
+
 def gradient_likelihood(kernel,x,xcalc,y,yerr):
     import inspect
     cov_matrix=likelihood_aux(kernel,x,xcalc,y,yerr)
@@ -176,31 +169,71 @@ def gradient_mul(kernel,x,xcalc,y,yerr):
     print 'Work in progress'
     from numpy import arange
     kernelOriginal=kernel #para nao perder a original com os calculos todos
+    cov_matrix=likelihood_aux(kernelOriginal,x,xcalc,y,yerr) #matrix cov original
     a=kernel.__dict__; len_dict=len(kernel.__dict__)
     grad_result=[]; kernel_result=[]
+    kernel_all=[]
     for i in arange(1,len_dict+1):
         var = "k%i"%i; ki = a[var]
-        Ai=[]; Ai.insert(1,ki)
-        #kernel_result.insert(1,ki)
-        #print i, ki
-        print 'A%i ='%i, Ai
-        ai=[]; ai.insert(1,kernel_identify(ki))
-        print 'a%i ='%i, ai
-    #print kernel_result
-    #for i in range(len_dict):
-        #calc = gradient_likelihood_mult(kernel_result[i],x,xcalc,y,yerr,kernelOriginal)
-                
-                
-                
-                
+        kernel_all.insert(1,ki)
+        kernel_all.insert(1,kernel_identify(ki))
+    print kernel_all[0]*kernel_all[1][0]
+    for i in  range(len(kernel_all)):
+        if i%2==0:
+            pass
+
+           
 def kernel_identify(kernel):
     import inspect
     if isinstance(kernel,kl.ExpSquared):
-        der1= kernel.dES_dtheta
-        der2= kernel.dES_dl
-        return der1, der2
-        #return kernel.dES_dtheta, kernel.dES_dl
+        return kernel.dES_dtheta, kernel.dES_dl
     elif isinstance(kernel,kl.ExpSineSquared):
         return kernel.dESS_dtheta, kernel.dESS_dl, kernel.dESS_dP
+    #elfi resto das kernels    
     else:
         print 'GO HOME! YOU ARE DRUNK'
+        
+        
+        
+##### OLD STUFF KEPT JUST IN CASE #############################################
+#def gradient_mul(kernel,x,xcalc,y,yerr):
+#    print 'Work in progress'
+#    from numpy import arange
+#    kernelOriginal=kernel #para nao perder a original com os calculos todos
+#    cov_matrix=likelihood_aux(kernelOriginal,x,xcalc,y,yerr) #matrix cov original
+#    a=kernel.__dict__; len_dict=len(kernel.__dict__)
+#    grad_result=[]; kernel_result=[]
+#    for i in arange(1,len_dict+1):
+#        var = "k%i"%i; ki = a[var]
+#        j=i+i; k=i+i+1        
+#        Aj=[];Aj.insert(1,ki)
+#        print j,'=', Aj
+#        Ak=[];Ak.insert(1,kernel_identify(ki))
+#        print k,'=', Ak
+#        #Ai=[]; Ai.insert(1,ki)
+#        #print 'A%i ='%i, Ai
+#        #return Ai        
+#        #ai=[]; ai.insert(1,kernel_identify(ki))
+#        #print 'a%i ='%i, ai
+#        #return ai
+#    #listas= listmaker(kernel)    
+#    #print listas    
+##    for j in arange(1,len_dict+1):
+##        for k in arange(1,len_dict+1):
+##            if j!=k:
+##                #NewKernel=a[j]*A[k]
+##                print 'j', j, 'k', k
+##                #NKernel=A%j+a%k
+##                #print Nkernel
+#                #print Aj                
+#  
+##def listmaker(kernel):
+##    from numpy import arange
+##    a=kernel.__dict__; len_dict=len(kernel.__dict__)    
+##    for i in arange(1,len_dict+1):
+##        var = "k%i"%i; ki = a[var]
+##        Ai=[]; Ai.insert(1,ki)
+##        print 'A%i ='%i, Ai
+##        #return Ai        
+##        ai=[]; ai.insert(1,kernel_identify(ki))
+##        return Ai, ai
