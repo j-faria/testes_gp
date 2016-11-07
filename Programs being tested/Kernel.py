@@ -60,6 +60,11 @@ class Product(_operator): #multiplication of kernels
     def __call__(self, x1, x2):
         return self.k1(x1, x2) * self.k2(x1, x2)
 
+    def parSize(self):
+        return self.pars.size
+        
+    def prod_kernel(self, x1, x2):
+        return self.k1(x1, x2), self.k2(x1, x2)
 
 class ExpSquared(Kernel):
     def __init__(self, ES_theta, ES_l):

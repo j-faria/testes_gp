@@ -164,34 +164,51 @@ def gradient_likelihood_sum(kernel,x,xcalc,y,yerr,kernelOriginal):
         print 'gradient -> NOPE'
 
 
-##### LIKELIHOOD GRADIENT FOR PRODUCTS -- IN TESTS IGNORE FOR NOW        
+##### LIKELIHOOD GRADIENT FOR PRODUCTS -- SEEMS TO WORK       
 def gradient_mul(kernel,x,xcalc,y,yerr):
-    print 'Work in progress'
+    #print 'Work in progress'
     from numpy import arange
     kernelOriginal=kernel #para nao perder a original com os calculos todos
     cov_matrix=likelihood_aux(kernelOriginal,x,xcalc,y,yerr) #matrix cov original
-    a=kernel.__dict__; len_dict=len(kernel.__dict__)
-    grad_result=[]; kernel_result=[]
-    kernel_all=[]
+    a=kernel.__dict__
+    len_dict=len(kernel.__dict__)
+    grad_result=[] #para aqui irao os gradientes finais no fim
+    kernelaux1=[] #para meter as kernels
+    kernelaux2=[] #para meter as derivadas das kernels
     for i in arange(1,len_dict+1):
-        var = "k%i"%i; ki = a[var]
-        kernel_all.insert(1,ki)
-        kernel_all.insert(1,kernel_identify(ki))
-    print kernel_all[0]*kernel_all[1][0]
-    for i in  range(len(kernel_all)):
-        if i%2==0:
-            pass
-
+        var = "k%i"%i; #ki = a[var]
+        kernelaux1.append(a[var])
+        kernelaux2.append(kernel_deriv(a[var]))
+    #print  kernelaux1; print kernelaux2
+    A1=len(kernelaux1) #quantas kernels temos
+    B1=len(kernelaux2) #quantos grupos de derivadas temos => A1=B1
+    #print len(kernelaux2[1])
+    for i1 in range(A1):
+        #print 'i1=',i1
+        for i2 in range(B1):
+            #print 'i2=',i2
+            if i1==i2:
+                pass
+            else:
+                 B2=len(kernelaux2[i2])
+                 for j in range(B2):
+                     #print 'j=',j
+                     result=grad_logp(kernelaux1[i1]*kernelaux2[i2][j],x,xcalc,y,yerr,cov_matrix)
+                     grad_result.insert(0,result)
+    print 'gradient ->', grad_result    
+    return grad_result
+   
            
-def kernel_identify(kernel):
+def kernel_deriv(kernel):
     import inspect
     if isinstance(kernel,kl.ExpSquared):
         return kernel.dES_dtheta, kernel.dES_dl
     elif isinstance(kernel,kl.ExpSineSquared):
         return kernel.dESS_dtheta, kernel.dESS_dl, kernel.dESS_dP
-    #elfi resto das kernels    
+    elif isinstance(kernel,kl.ExpSineGeorge):
+        return kernel.dE_dGamma, kernel.dE_dP
     else:
-        print 'GO HOME! YOU ARE DRUNK'
+        print 'Faltam mais elif com  as outras kernels!'
         
         
         
