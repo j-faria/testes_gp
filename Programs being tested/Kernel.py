@@ -6,7 +6,6 @@ Created on Wed Sep  7 10:42:48 2016
 """
 import numpy as np
 
- 
 ##### KERNELS 
 class Kernel(object):
     def __init__(self, *args):
@@ -30,6 +29,7 @@ class Kernel(object):
         """ Representation of each Kernel instance """
         return "{0}({1})".format(self.__class__.__name__,
                                  ", ".join(map(str, self.pars)))
+
                                  
 class _operator(Kernel):
     def __init__(self, k1, k2):
@@ -40,6 +40,7 @@ class _operator(Kernel):
     def pars(self):
         return np.append(self.k1.pars, self.k2.pars)
 
+
 class Sum(_operator): #sum of kernels
     def __repr__(self):
         return "{0} + {1}".format(self.k1, self.k2)
@@ -48,10 +49,8 @@ class Sum(_operator): #sum of kernels
         return self.k1(x1, x2) + self.k2(x1, x2)
 
     def parSize(self):
-        return self.pars.size
-        
-    #def dcall(self, parnum ...)
-        #self.pars.size numero de param da soma
+        return self.pars.size   
+
 
 class Product(_operator): #multiplication of kernels
     def __repr__(self):
@@ -183,12 +182,17 @@ class WhiteNoise(Kernel):
         self.WN_theta=WN_theta                        
                                                       
     def __call__(self, x1, x2):
-        f1=self.WN_theta**2                           
-        #f2=(x1-x2)     
-        #f3=kd(i,j)
-        f4=np.diag(np.ones_like(x1))
+        f1=self.WN_theta**2
+        if x1==x2:
+            f4=1                          
+        #f4=np.diag(np.ones_like(x1))
         return f1*f4 #Nao funciona, é preciso rever!
-        
+
+    def dWN_dtheta(self,x1,x2):
+        f1=self.WN_theta**2  #theta
+        f4=np.diag(np.ones_like(x1))
+        return 2*f1*f4      
+                
 
 class Exponential(Kernel): #Matern 1/2 = Exponential
     def __init__(self,Exp_theta,Exp_l):
@@ -209,10 +213,10 @@ class Exponential(Kernel): #Matern 1/2 = Exponential
         return 2*f1*np.exp(-f2/f3)        
         
     def dExp_dl(self,x1,x2):
-        f1=self.Exp_theta**2    #theta**2
-        f2=(x1-x2)              #(x1-x2)
-        f3=self.Exp_l           #l
-        f4=self.Exp_l**2        #l**2
+        f1=self.Exp_theta**2  #theta**2
+        f2=(x1-x2)            #(x1-x2)
+        f3=self.Exp_l         #l
+        f4=self.Exp_l**2      #l**2
         return (f1*f2/f3)*np.exp(-f2/f3)
     
 
