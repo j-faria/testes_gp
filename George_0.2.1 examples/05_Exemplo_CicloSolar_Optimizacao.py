@@ -31,29 +31,31 @@ k0 = kernels.WhiteKernel(100)
 
 kernel = k2 #+ k0
 
+
     #optimization  - find the “best-fit” hyperparameters
 gp = GP(kernel, mean=np.mean(y))
 #gp = GP(kernel, solver=HODLRSolver)
 gp.compute(t,yerr)
-print(gp.lnlikelihood(y))
-print(gp.grad_lnlikelihood(y))
-print(kernel) #kernel  inicial
+print 'likelihood =', gp.lnlikelihood(y) 
+print 'gradient =',gp.grad_lnlikelihood(y)
+print 'kernel =',kernel #kernel  inicial
 
 mu, cov = gp.predict(y, t) #mean mu and covariance cov
 std = np.sqrt(np.diag(cov))
 
-    #Graficos todos xpto - kernel inicial
-pl.figure()
-pl.plot(t,y,'.')
-pl.grid()
-pl.show()
-pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
-pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
-pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
-pl.plot(t, mu, color="r", alpha=1, lw=0.9)
-#pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
-pl.xlabel("$tempo$")
-pl.ylabel("$manchas$")
+#    #Graficos todos xpto - kernel inicial
+#pl.figure()
+#pl.plot(t,y,'.')
+#pl.grid()
+#pl.show()
+#pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
+#pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
+#pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
+#pl.plot(t, mu, color="r", alpha=1, lw=0.9)
+##pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
+#pl.xlabel("$tempo$")
+#pl.ylabel("$manchas$")
+
 
 ########## OPTIMIZAR HIPERPARAMETROS ##########
 import scipy.optimize as op
@@ -74,19 +76,15 @@ def grad_nll(p):
     return -gp.grad_lnlikelihood(y, quiet=True)
 
 ## You need to compute the GP once before starting the optimization.
-#gp.compute(t,yerr)
-#
-## Print the initial ln-likelihood.
-#print(gp.lnlikelihood(y))
+gp.compute(t,yerr)
 
 # Run the optimization routine.
 p0 = gp.kernel.vector
 results = op.minimize(nll, p0, jac=grad_nll)
-
 # Update the kernel and print the final log-likelihood.
 gp.kernel[:] = results.x
-print('likelihoo:',gp.lnlikelihood(y))
-print('kernel:',kernel) #kernel final
+print 'likelihood =',gp.lnlikelihood(y)
+print 'kernel =',kernel  #kernel final
 
 ########## PARTE GRAFICA ##########
     #Compute the predicted values of the function at a fine grid of points 
@@ -97,19 +95,19 @@ print('kernel:',kernel) #kernel final
 #x = np.linspace(1996.5, 2009, len(t))
 #x = np.linspace(max(t),2050,(2050-max(t))*12) #previsao ?
 #x=np.linspace(min(t),2050,(2050-min(t))*12)
-mu, cov = gp.predict(y, t) #mean mu and covariance cov
-std = np.sqrt(np.diag(cov))
-
-    #Graficos todos xpto - kernel final
-pl.figure()
-pl.plot(t,y,'.')
-pl.grid()
-pl.show()
-pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
-pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
-pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
-pl.plot(t, mu, color="r", alpha=1, lw=0.9)
-#pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
-pl.xlabel("$tempo$")
-pl.ylabel("$manchas$")
-
+#mu, cov = gp.predict(y, t) #mean mu and covariance cov
+#std = np.sqrt(np.diag(cov))
+#
+#    #Graficos todos xpto - kernel final
+#pl.figure()
+#pl.plot(t,y,'.')
+#pl.grid()
+#pl.show()
+#pl.fill_between(t, mu+std, mu-std, color="k", alpha=0.1)
+#pl.plot(t, mu+std, color="k", alpha=1, lw=0.25)
+#pl.plot(t, mu-std, color="k", alpha=1, lw=0.25)
+#pl.plot(t, mu, color="r", alpha=1, lw=0.9)
+##pl.errorbar(x, y, yerr=yerr,xerr=None, fmt=".k", capsize=0)
+#pl.xlabel("$tempo$")
+#pl.ylabel("$manchas$")
+#
