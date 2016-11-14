@@ -65,29 +65,29 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
     if isinstance(kernel,kl.ExpSquared):
         grad1=grad_logp(kernel.dES_dtheta, x, xcalc, y, yerr, cov_matrix)
         grad2=grad_logp(kernel.dES_dl, x, xcalc, y, yerr, cov_matrix)
-        print 'gradient ->', grad1, grad2
+        #print 'gradient ->', grad1, grad2
         return grad1, grad2
     elif isinstance(kernel,kl.ExpSineSquared):
         grad1=grad_logp(kernel.dESS_dtheta,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dESS_dl,x,xcalc,y,yerr,cov_matrix)
         grad3=grad_logp(kernel.dESS_dP,x,xcalc,y,yerr,cov_matrix)
-        print 'gradient ->', grad1, grad2, grad3
+        #print 'gradient ->', grad1, grad2, grad3
         return grad1, grad2, grad3 
     elif isinstance(kernel,kl.RatQuadratic):
         grad1=grad_logp(kernel.dRQ_dtheta,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dRQ_dalpha,x,xcalc,y,yerr,cov_matrix)
         grad3=grad_logp(kernel.dRQ_dl,x,xcalc,y,yerr,cov_matrix)
-        print 'gradient ->', grad1, grad2, grad3
+        #print 'gradient ->', grad1, grad2, grad3
         return grad1, grad2, grad3 
     elif isinstance(kernel,kl.Exponential):
         grad1=grad_logp(kernel.dExp_dtheta,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dExp_dl,x,xcalc,y,yerr,cov_matrix)
-        print 'gradient ->', grad1, grad2
+        #print 'gradient ->', grad1, grad2
         return grad1, grad2, grad3 
     elif isinstance(kernel,kl.ExpSineGeorge):
         grad1=grad_logp(kernel.dE_dGamma,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dE_dP,x,xcalc,y,yerr,cov_matrix) 
-        print 'gradient ->', grad1, grad2
+        #print 'gradient ->', grad1, grad2
         return grad1, grad2
     elif isinstance(kernel,kl.Matern_32):
         grad1=grad_logp(kernel.dM32_dtheta,x,xcalc,y,yerr,cov_matrix)
@@ -100,7 +100,7 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
     elif isinstance(kernel,kl.ExpSineGeorge):
         grad1=grad_logp(kernel.dE_dGamma,x,xcalc,y,yerr,cov_matrix)
         grad2=grad_logp(kernel.dE_dP,x,xcalc,y,yerr,cov_matrix) 
-        return grad1, grad2
+        return [grad1, grad2]
     elif isinstance(kernel,kl.Sum):
         gradient_sum(kernel,x,xcalc,y,yerr)
     elif isinstance(kernel,kl.Product):
@@ -212,3 +212,77 @@ def kernel_deriv(kernel):
     else:
         print 'Falta o white noise!'
         
+        
+##### GRADIENT DESCENT ALGORITHM
+from scipy import optimize as op
+from numpy import arange
+    
+def opt_likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations   
+    K = np.zeros((len(x),len(x))) #covariance matrix K
+    for i in range(len(x)):
+        x1 = x[i]
+        for j in range(len(xcalc)):                      
+            x2 = xcalc[j]
+            K[i,j] = kernel(x1, x2)
+    K=K+yerr**2*np.identity(len(x))      
+    log_p_correct = lnlike(K, y)
+    from scipy.linalg import cho_factor, cho_solve
+    L1 = cho_factor(K) # tuple (L, lower)
+    sol = cho_solve(L1, y) # this is K^-1*(r)
+    n = y.size
+    logLike = -0.5*np.dot(y, sol) \
+              - np.sum(np.log(np.diag(L1[0]))) \
+              - n*0.5*np.log(2*np.pi)        
+    return logLike
+
+def opt_gradlike(kernel, x,xcalc,y,yerr):
+    grd= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
+    grd= [-grd for grd in grd] #isto só para inverter os si
+    return grd    
+    
+def optimization(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5):
+    first= opt_likelihood(kernel,x,xcalc,y,yerr ) #likelihood
+    
+    second= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
+    
+    kernelll=kernel #para nao perder a original com os calculos todos
+    a=kernel.__dict__['pars']
+    a=np.log(a)
+    
+    results = op.minimize(first,a,jac=second)    
+    
+    print a
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#    a=kernel.__dict__
+#    p0=[]
+#    for i in range(len(a['pars'])):
+#        p0.append(a['pars'][i])
+#    p0=np.array(p0)
+#    print type(p0), p0
+#    
+#    for i in arange(1,len(kernel.__dict__)+1):
+#        var = "k%i" %i
+#        k_i = a[var]
+#    print k_i
+#    results = op.minimize(lik, p0, jac=grd)
+#    #p0 é o valor dos hiperparametros
+#    #jac  é igual a -gradient_likelihood
