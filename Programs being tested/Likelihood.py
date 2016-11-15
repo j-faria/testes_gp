@@ -239,28 +239,53 @@ def opt_gradlike(kernel, x,xcalc,y,yerr):
     grd= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
     grd= [-grd for grd in grd] #isto só para inverter os si
     return grd    
+
+def new_kernel(kernel):
     
-def optimization(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5):
-    first= opt_likelihood(kernel,x,xcalc,y,yerr ) #likelihood
     
-    second= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
+def optimization(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5,iterations=1):
+    kernelFIRST=kernel #just not to loose the original one
     
-    kernelll=kernel #para nao perder a original com os calculos todos
-    a=kernel.__dict__['pars']
-    a=np.log(a)
+    hyperparms=[] #initial values of the hyperparameters 
+    for i in range(len(kernel.__dict__['pars'])):
+        hyperparms.append(kernel.__dict__['pars'][i])
     
-    results = op.minimize(first,a,jac=second)    
-    
-    print a
+    i=0 
+    while i<iterations: #to limit the number of iterations
+        first_calc= opt_likelihood(kernel,x,xcalc,y,yerr ) #likelihood
+        second_calc= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
+        grd= [-second_calc for second_calc in second_calc] #just to invert the grad
+
+        #print 'antes', hyperparms        
+        new_hyperparams = [x*step for x in grd]
+        #print 'LAMBDAxGRAD', new_hyperparams
+        new_hyperparams = [sum(x) for x in zip(hyperparms, new_hyperparams)]
+        #print 'final', new_hyperparams
+        #print type(new_hyperparams)
+
+        kernel.__dict__['pars'][:]=new_hyperparams
+        
+#HA DUAS HIPOTESES
+#ou faço nova função para criar uma nova kernel actualizada
+#ou arranjo maneira de os parametros alterarem
+        
+        
+        a=kernel.__dict__     
+        print  'nova  kernel? ->', a
+        
+        #print 'opt_likelihood ->', first_calc
+        #print '-gradient ->', grd
+        #print 'iteracoes ->', i
+        
+        i+=1
+        print  'update kernel ->', kernel
+        new_kernel = 'kernel'
+        print new_kernel        
+        #first_calc2= opt_likelihood(new_kernel,x,xcalc,y,yerr ) #likelihood
+        #second_calc2= gradient_likelihoodnew_kernel, x,xcalc,y,yerr) #gradient likelihood
 
 
-
-
-
-
-
-
-
+import tests
 
 
 

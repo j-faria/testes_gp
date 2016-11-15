@@ -30,7 +30,9 @@ class Kernel(object):
         return "{0}({1})".format(self.__class__.__name__,
                                  ", ".join(map(str, self.pars)))
 
-                                 
+    def change_params(self):
+        return Kernel(self)
+                             
 class _operator(Kernel):
     def __init__(self, k1, k2):
         self.k1 = k1
