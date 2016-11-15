@@ -6,9 +6,8 @@ Created on Mon Oct 10 17:27:49 2016
 """
 import Kernel;reload(Kernel);kl = Kernel
 import numpy as np
+import inspect
 from time import time   
-import inspect as i
-
 
 ##### LIKELIHOOD
 def likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations   
@@ -111,11 +110,10 @@ def gradient_likelihood(kernel,x,xcalc,y,yerr):
 
 ##### LIKELIHOOD GRADIENT FOR SUMS -- SEEMS TO WORK      
 def gradient_sum(kernel,x,xcalc,y,yerr):
-    from numpy import arange
     kernelOriginal=kernel #para nao perder a original com os calculos todos
     a=kernel.__dict__
     grad_result=[]    
-    for i in arange(1,len(kernel.__dict__)+1):
+    for i in np.arange(1,len(kernel.__dict__)+1):
         var = "k%i" %i
         k_i = a[var]
         calc = gradient_likelihood_sum(k_i,x,xcalc,y,yerr,kernelOriginal)
@@ -128,7 +126,6 @@ def gradient_sum(kernel,x,xcalc,y,yerr):
     #Devolve NoneType -> acontece se faltar return no gradient_likelihood
             
 def gradient_likelihood_sum(kernel,x,xcalc,y,yerr,kernelOriginal):
-    import inspect
     cov_matrix=likelihood_aux(kernelOriginal,x,xcalc,y,yerr)
     if isinstance(kernel,kl.ExpSquared):
         grad1=grad_logp(kernel.dES_dtheta, x, xcalc, y, yerr, cov_matrix)
@@ -166,8 +163,6 @@ def gradient_likelihood_sum(kernel,x,xcalc,y,yerr,kernelOriginal):
 
 ##### LIKELIHOOD GRADIENT FOR PRODUCTS -- SEEMS TO WORK       
 def gradient_mul(kernel,x,xcalc,y,yerr):
-    #print 'Work in progress'
-    from numpy import arange
     kernelOriginal=kernel #para nao perder a original com os calculos todos
     cov_matrix=likelihood_aux(kernelOriginal,x,xcalc,y,yerr) #matrix cov original
     a=kernel.__dict__
@@ -175,7 +170,7 @@ def gradient_mul(kernel,x,xcalc,y,yerr):
     grad_result=[] #para aqui irao os gradientes finais no fim
     kernelaux1=[] #para meter as kernels
     kernelaux2=[] #para meter as derivadas das kernels
-    for i in arange(1,len_dict+1):
+    for i in np.arange(1,len_dict+1):
         var = "k%i"%i
         kernelaux1.append(a[var])
         kernelaux2.append(kernel_deriv(a[var]))
@@ -194,7 +189,6 @@ def gradient_mul(kernel,x,xcalc,y,yerr):
     return grad_result   
            
 def kernel_deriv(kernel):
-    import inspect
     if isinstance(kernel,kl.ExpSquared):
         return kernel.dES_dtheta, kernel.dES_dl
     elif isinstance(kernel,kl.ExpSineSquared):
@@ -213,10 +207,7 @@ def kernel_deriv(kernel):
         print 'Falta o white noise!'
         
         
-##### GRADIENT DESCENT ALGORITHM
-from scipy import optimize as op
-from numpy import arange
-    
+##### GRADIENT DESCENT ALGORITHM    
 def opt_likelihood(kernel, x, xcalc, y, yerr): #covariance matrix calculations   
     K = np.zeros((len(x),len(x))) #covariance matrix K
     for i in range(len(x)):
@@ -240,63 +231,94 @@ def opt_gradlike(kernel, x,xcalc,y,yerr):
     grd= [-grd for grd in grd] #isto só para inverter os si
     return grd    
 
-def new_kernel(kernel):
-    
-    
-def optimization(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5,iterations=1):
+def new_kernel(kernelFIRST,b):
+    if isinstance(kernelFIRST,kl.ExpSquared):
+        return kl.ExpSquared(b[0],b[1])
+    elif isinstance(kernelFIRST,kl.ExpSineSquared):
+        return kl.ExpSineSquared(b[0],b[1],b[2])
+    elif  isinstance(kernelFIRST,kl.RatQuadratic):
+        return kl.RatQuadratic(b[0],b[1],b[2])
+    elif isinstance(kernelFIRST,kl.Exponential):
+        return kl.Exponential(b[0],b[1])
+    elif isinstance(kernelFIRST,kl.Matern_32):
+        return kl.Matern_32(b[0],b[1])
+    elif isinstance(kernelFIRST,kl.Matern_52):
+        return kl.Matern_52(b[0],b[1])
+    elif isinstance(kernelFIRST,kl.ExpSineGeorge):
+        return kl.ExpSineGeorge(b[0],b[1])
+    else:
+        print 'Falta o white noise!'    
+
+def optimization(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5,iterations=5):
     kernelFIRST=kernel #just not to loose the original one
+   
+    it=0
+    while it<iterations:
+        hyperparms=[] #initial values of the hyperparameters 
+        for k in range(len(kernel.__dict__['pars'])):
+            hyperparms.append(kernel.__dict__['pars'][k]) 
+        
+        first_calc= opt_likelihood(kernel,x,xcalc,y,yerr) #likelihood
+        second_calc= opt_gradlike(kernel, x,xcalc,y,yerr) #gradient likelihood
+        print 'opt_likelihood ->', first_calc
+        print '-gradient ->', second_calc; print ''
     
-    hyperparms=[] #initial values of the hyperparameters 
-    for i in range(len(kernel.__dict__['pars'])):
-        hyperparms.append(kernel.__dict__['pars'][i])
-    
-    i=0 
-    while i<iterations: #to limit the number of iterations
-        first_calc= opt_likelihood(kernel,x,xcalc,y,yerr ) #likelihood
-        second_calc= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
-        grd= [-second_calc for second_calc in second_calc] #just to invert the grad
-
-        #print 'antes', hyperparms        
-        new_hyperparams = [x*step for x in grd]
-        #print 'LAMBDAxGRAD', new_hyperparams
+        print 'antes', hyperparms #X_i
+        new_hyperparams = [x*step for x in second_calc]
+        print 'LAMBDAxGRAD', new_hyperparams # - Lambda * gradFunction
         new_hyperparams = [sum(x) for x in zip(hyperparms, new_hyperparams)]
-        #print 'final', new_hyperparams
-        #print type(new_hyperparams)
-
-        kernel.__dict__['pars'][:]=new_hyperparams
+        print 'final', new_hyperparams #X_i+1
+        kernel.__dict__['pars'][:]=new_hyperparams 
+        print 'kernel? ->',type( kernel.__dict__['pars'])
+        a= kernel.__dict__['pars']
         
-#HA DUAS HIPOTESES
-#ou faço nova função para criar uma nova kernel actualizada
-#ou arranjo maneira de os parametros alterarem
+        b=[]    
+        for ij in range(len(a)):
+            b.append(a[ij])
+        print 'b',b   
+        
+        kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
+        print 'nova kernel ->',kernel
+        a1 = kernel.__dict__
+        print a1
+        
+        print 'iteration number:',it
+        it+=1 #should go back to the start of the while, but error is raised
         
         
-        a=kernel.__dict__     
-        print  'nova  kernel? ->', a
         
-        #print 'opt_likelihood ->', first_calc
-        #print '-gradient ->', grd
-        #print 'iteracoes ->', i
         
-        i+=1
-        print  'update kernel ->', kernel
-        new_kernel = 'kernel'
-        print new_kernel        
-        #first_calc2= opt_likelihood(new_kernel,x,xcalc,y,yerr ) #likelihood
-        #second_calc2= gradient_likelihoodnew_kernel, x,xcalc,y,yerr) #gradient likelihood
-
-
 import tests
-
-
-
-
-
-
-
-
-
-
-
+##### trash - do not delete ###################################################
+        
+#def optimization1(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5,iterations=5):
+#    kernelFIRST=kernel #just not to loose the original one
+#    hyperparms=[] #initial values of the hyperparameters 
+#    for i in range(len(kernel.__dict__['pars'])):
+#        hyperparms.append(kernel.__dict__['pars'][i])
+#    print hyperparms
+#    i=0 
+#    while i<iterations: #to limit the number of iterations
+#        first_calc= opt_likelihood(kernel,x,xcalc,y,yerr ) #likelihood
+#        second_calc= gradient_likelihood(kernel, x,xcalc,y,yerr) #gradient likelihood
+#        grd= [-second_calc for second_calc in second_calc] #just to invert the grad
+#
+#        a=kernel.__dict__['pars']
+#        print a
+#        x1=kernel.__dict__['pars'][0]
+#        x2=kernel.__dict__['pars'][1]
+#        print 'x1=',x1, 'x2=',x2
+#        
+#        
+#        results = op.minimize(first,a,jac=second)    
+#      
+#        print 'opt_likelihood ->', first_calc
+#        print '-gradient ->', grd
+#        print 'iteracoes ->', i
+#
+#        i+=1
+#        print  kernel
+#        
 #    a=kernel.__dict__
 #    p0=[]
 #    for i in range(len(a['pars'])):
