@@ -21,30 +21,28 @@ y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
 ###############################################################################
 
 #EXAMPLE OURS-GEORGE USING ExpSineSquared
-# Calculation using our stuff
 print  '########## EXEMPLE EQUAL TO GEORGE ##########'
-print 'kernel ->', kernel1
+
 kernel1=kl.ExpSineGeorge(2.0/1.1**2, 7.1)
+print 'kernel ->', kernel1; 
 lk.likelihood(kernel1, x1, x1, y1, yerr1)
-print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1)
-print ' '
+print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
+
 lk.optimization(kernel1, x1, x1, y1, yerr1)
 
 
 print '########## Calculations from george ##########'
-# Calculation using george
 kernel = ge.ExpSine2Kernel(2.0/1.1**2, 7.1)
 gp = george.GP(kernel)
 gp.compute(x1,yerr1)
-#print '--->', kernel[:]
 
-print 'kernel ->', kernel
-print 'likelihood_george ->', gp.lnlikelihood(y1)
-print 'gradient_george ->', gp.grad_lnlikelihood(y1)
-print ' '
+
+#print 'kernel ->', kernel
+#print 'likelihood_george ->', gp.lnlikelihood(y1)
+print 'gradient_george ->', gp.grad_lnlikelihood(y1); print ''
+
 ### OPTIMIZE HYPERPARAMETERS
 import scipy.optimize as op
-
 # Define the objective function (negative log-likelihood in this case).
 def nll(p):
     # Update the kernel parameters and compute the likelihood.
