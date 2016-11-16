@@ -12,3 +12,6 @@ from Kernel import *
 
 #importar calculos da likelihood, gradient e optimization
 from Likelihood import *
+
+
+#Nao funciona :(
