@@ -249,42 +249,61 @@ def new_kernel(kernelFIRST,b):
     else:
         print 'Falta o white noise!'    
 
-def optimization(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5,iterations=5):
+
+##### Steepest descent
+def optimization(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=5):
     kernelFIRST=kernel #just not to loose the original one
-   
+    xFIRST=x;xcalcFIRST=xcalc #just not to loose the original data
+    yFIRST=y;yerrFIRST=yerr #just not to loose the original data
+    #If I don't do this "...FIRST" to save the data it would raise as error
+    
     it=0
     while it<iterations:
+#        print 'iteration number:',it+1
         hyperparms=[] #initial values of the hyperparameters 
         for k in range(len(kernel.__dict__['pars'])):
-            hyperparms.append(kernel.__dict__['pars'][k]) 
+            hyperparms.append(kernel.__dict__['pars'][k])
+#        print 'hyperparameters ->', hyperparms
+#        hyperparms=[np.log(x) for x in hyperparms]
+        hyperparms = hyperparms
+#        if it==0:
+#            hyperparms = [np.log(x) for x in hyperparms]
+#            hyperparms = hyperparms
+#        else:
+#            hyperparms = [np.log(x) for x in hyperparms]
+#            hyperparms = hyperparms
+#        print 'hyperparameters ->', hyperparms       
+#        print 'kernel ->', kernel; print ''
         
-        first_calc= opt_likelihood(kernel,x,xcalc,y,yerr) #likelihood
-        second_calc= opt_gradlike(kernel, x,xcalc,y,yerr) #gradient likelihood
-        print 'opt_likelihood ->', first_calc
-        print '-gradient ->', second_calc; print ''
+#        first_calc= opt_likelihood(kernel,xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #likelihood
+        second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
+        #print 'opt_likelihood ->', first_calc
+        #print '-gradient ->', second_calc; print ''
     
-        print 'antes', hyperparms #X_i
-        new_hyperparams = [x*step for x in second_calc]
-        print 'LAMBDAxGRAD', new_hyperparams # - Lambda * gradFunction
-        new_hyperparams = [sum(x) for x in zip(hyperparms, new_hyperparams)]
-        print 'final', new_hyperparams #X_i+1
-        kernel.__dict__['pars'][:]=new_hyperparams 
-        print 'kernel? ->',type( kernel.__dict__['pars'])
-        a= kernel.__dict__['pars']
+        #print 'antes', hyperparms #X_i
+        new_hyperparms = [x*step for x in second_calc]
+        #print '-LAMBDAxGRAD', new_hyperparms # - Lambda * gradFunction
+        new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
+        #print 'final', new_hyperparms #X_i+1
+        kernel.__dict__['pars'][:]=new_hyperparms 
+        a = kernel.__dict__['pars']
         
         b=[]    
         for ij in range(len(a)):
-            b.append(a[ij])
-        print 'b',b   
-        
+            b.append(a[ij])         
         kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
-        print 'nova kernel ->',kernel
-        a1 = kernel.__dict__
-        print a1
+#        print 'nova kernel ->',kernel; print''
         
-        print 'iteration number:',it
-        it+=1 #should go back to the start of the while, but error is raised
+#        first_calc= opt_likelihood(kernel,xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #likelihood
+        #print 'opt_likelihood ->', first_calc
+#        second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood        
+#        print '-gradient ->', second_calc; print ''        
         
+        it+=1 #should go back to the start and do the while, but error is raised
+        first_calc= opt_likelihood(kernel,xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #likelihood    
+    print 'iterations ->', it
+    print 'new kernel ->', kernel
+    print 'log likelihood ->',  first_calc
         
         
         
