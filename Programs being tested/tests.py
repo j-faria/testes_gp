@@ -24,9 +24,9 @@ y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
 print  '########## EXEMPLE EQUAL TO GEORGE ##########'
 
 kernel1=kl.ExpSineGeorge(2.0/1.1**2, 7.1)
-print 'kernel ->', kernel1; 
-lk.likelihood(kernel1, x1, x1, y1, yerr1)
-print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
+#print 'kernel ->', kernel1; 
+#lk.likelihood(kernel1, x1, x1, y1, yerr1)
+#print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
 
 lk.optimization(kernel1, x1, x1, y1, yerr1)
 
@@ -65,8 +65,10 @@ def grad_nll(p):
 ## Run the optimization routine.
 
 p0 = gp.kernel.vector
-print p0
-results = op.minimize(nll, p0, jac=grad_nll)
+print 'p0=',p0
+print 'nll cena=', gp.kernel[:]
+#results = op.minimize(nll, p0,jac=grad_nll)
+results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':5})
 
 # Update the kernel and print the final log-likelihood.
 gp.kernel[:] = results.x
