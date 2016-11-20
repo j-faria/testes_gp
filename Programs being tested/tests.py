@@ -5,9 +5,10 @@ Created on Wed Sep 28 15:26:46 2016
 @author: camacho
 """
 import Kernel;reload(Kernel);kl = Kernel
-import Likelihood as lk
-import numpy as np
+import kernel_likelihood;reload(kernel_likelihood); lk= kernel_likelihood
+import kernel_optimization as opt
 
+import numpy as np
 import matplotlib.pyplot as pl
 
 import george
@@ -24,11 +25,11 @@ y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
 print  '########## EXEMPLE EQUAL TO GEORGE ##########'
 
 kernel1=kl.ExpSineGeorge(2.0/1.1**2, 7.1)
-#print 'kernel ->', kernel1; 
+print 'kernel ->', kernel1; 
 #lk.likelihood(kernel1, x1, x1, y1, yerr1)
 #print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
 
-lk.optimization(kernel1, x1, x1, y1, yerr1)
+opt.optimization(kernel1, x1, x1, y1, yerr1,method='SDA')
 
 
 print '########## Calculations from george ##########'
@@ -37,9 +38,9 @@ gp = george.GP(kernel)
 gp.compute(x1,yerr1)
 
 
-#print 'kernel ->', kernel
+print 'kernel ->', kernel
 #print 'likelihood_george ->', gp.lnlikelihood(y1)
-print 'gradient_george ->', gp.grad_lnlikelihood(y1); print ''
+#print 'gradient_george ->', gp.grad_lnlikelihood(y1); print ''
 
 ### OPTIMIZE HYPERPARAMETERS
 import scipy.optimize as op
@@ -65,10 +66,10 @@ def grad_nll(p):
 ## Run the optimization routine.
 
 p0 = gp.kernel.vector
-print 'p0=',p0
-print 'nll cena=', gp.kernel[:]
+#print 'p0=',p0
+#print 'nll cena=', gp.kernel[:]
 #results = op.minimize(nll, p0,jac=grad_nll)
-results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':5})
+results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':10})
 
 # Update the kernel and print the final log-likelihood.
 gp.kernel[:] = results.x
