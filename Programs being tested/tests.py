@@ -69,7 +69,7 @@ p0 = gp.kernel.vector
 #print 'p0=',p0
 #print 'nll cena=', gp.kernel[:]
 #results = op.minimize(nll, p0,jac=grad_nll)
-results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':10})
+results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':5})
 
 # Update the kernel and print the final log-likelihood.
 gp.kernel[:] = results.x
