@@ -29,7 +29,7 @@ print 'kernel ->', kernel1;
 #lk.likelihood(kernel1, x1, x1, y1, yerr1)
 #print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
 
-opt.optimization(kernel1, x1, x1, y1, yerr1,method='SDA')
+opt.optimization(kernel1, x1, x1, y1, yerr1,method='CGA')
 
 
 print '########## Calculations from george ##########'
