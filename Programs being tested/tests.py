@@ -25,12 +25,12 @@ y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
 print  '########## EXEMPLE EQUAL TO GEORGE ##########'
 
 kernel1=kl.ExpSineGeorge(2.0/1.1**2, 7.1)
-print 'kernel ->', kernel1; 
+print 'Initial kernel ->', kernel1; 
 #lk.likelihood(kernel1, x1, x1, y1, yerr1)
 #print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
 
-opt.optimization(kernel1, x1, x1, y1, yerr1,method='CGA')
-
+#opt.optimization(kernel1, x1, x1, y1, yerr1,method='CGA')
+opt.optimization(kernel1, x1, x1, y1, yerr1,method='SDA')
 
 print '########## Calculations from george ##########'
 kernel = ge.ExpSine2Kernel(2.0/1.1**2, 7.1)
@@ -38,7 +38,7 @@ gp = george.GP(kernel)
 gp.compute(x1,yerr1)
 
 
-print 'kernel ->', kernel
+print 'Initial kernel ->', kernel
 #print 'likelihood_george ->', gp.lnlikelihood(y1)
 #print 'gradient_george ->', gp.grad_lnlikelihood(y1); print ''
 
@@ -58,7 +58,7 @@ def grad_nll(p):
     # Update the kernel parameters and compute the likelihood.
     gp.kernel[:] = p
     return -gp.grad_lnlikelihood(y1, quiet=True)
-    print 'cenas', -gp.grad_lnlikelihood(y1, quiet=True)
+    #print 'cenas', -gp.grad_lnlikelihood(y1, quiet=True)
 # You need to compute the GP once before starting the optimization.
 #gp.compute(x1,yerr1)
 ## Print the initial ln-likelihood.
@@ -69,10 +69,11 @@ p0 = gp.kernel.vector
 #print 'p0=',p0
 #print 'nll cena=', gp.kernel[:]
 #results = op.minimize(nll, p0,jac=grad_nll)
-results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':5})
+results = op.minimize(nll, p0,method='CG', jac=grad_nll,options={'maxiter':10})
 
 # Update the kernel and print the final log-likelihood.
 gp.kernel[:] = results.x
+print 'total iterations =', 10
 print 'likelihood_george =', gp.lnlikelihood(y1)
 print 'kernel_george =', kernel #kernel final
 ###############################################################################
