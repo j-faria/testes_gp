@@ -20,17 +20,21 @@ x1 = 10 * np.sort(np.random.rand(101))
 yerr1 = 0.2 * np.ones_like(x1)
 y1 = np.sin(x1) + yerr1 * np.random.randn(len(x1))
 ###############################################################################
+print ''
+print '1 - CGA'
 
 #EXAMPLE OURS-GEORGE USING ExpSineSquared
 print  '########## EXEMPLE EQUAL TO GEORGE ##########'
 
 kernel1=kl.ExpSineGeorge(2.0/1.1**2, 7.1)
 print 'Initial kernel ->', kernel1; 
-#lk.likelihood(kernel1, x1, x1, y1, yerr1)
+lk.likelihood(kernel1, x1, x1, y1, yerr1)
+print''
 #print 'gradient ->', lk.gradient_likelihood(kernel1, x1, x1, y1, yerr1); print ''
 
-#opt.optimization(kernel1, x1, x1, y1, yerr1,method='CGA')
-opt.optimization(kernel1, x1, x1, y1, yerr1,method='SDA')
+opt.optimization(kernel1, x1, x1, y1, yerr1,method='CGA')
+#opt.optimization(kernel1, x1, x1, y1, yerr1,method='SDA')
+#opt.optimization(kernel1, x1, x1, y1, yerr1,method='RPROP')
 
 print '########## Calculations from george ##########'
 kernel = ge.ExpSine2Kernel(2.0/1.1**2, 7.1)
