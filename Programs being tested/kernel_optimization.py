@@ -72,7 +72,7 @@ def new_kernel(kernelFIRST,b):
 
 
 # Rprop Algorithm
-def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
+def RPROP(kernel,x,xcalc,y,yerr,d=0.1,dmin=1e-6,dmax=50,iterations=20):
     kernelFIRST=kernel #just not to loose the original one
     xFIRST=x;xcalcFIRST=xcalc #just not to loose the original data
     yFIRST=y;yerrFIRST=yerr #just not to loose the original data
@@ -87,25 +87,34 @@ def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
     
     #first calc gives S1 / gradient of t-1
     first_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
-    #print 'first_calc', first_calc 
-    #new_hyperparms first gives lambdaXS1
-    new_hyperparms = [x*step for x in first_calc] #gives lambda x S1
-    #print '-LAMBDAxGRAD', new_hyperparms # - Lambda * gradFunction
-    #new_hyperparms now gives X1 + lambda x S1
-    new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
-    kernel.__dict__['pars'][:]=new_hyperparms 
-    a = kernel.__dict__['pars']
-    
-    b=[]    
-    for ij in range(len(a)):
-        b.append(a[ij])         
-    kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
-    #print 'nova kernel ->',kernel; print''    
-   
+    for i in range(len(first_calc)):
+        first_calc[i]=0
+#    print first_calc
+#    #print 'first_calc', first_calc 
+#    #new_hyperparms first gives lambdaXS1
+#    new_hyperparms = [x*step for x in first_calc] #gives lambda x S1
+#    #print '-LAMBDAxGRAD', new_hyperparms # - Lambda * gradFunction
+#    #new_hyperparms now gives X1 + lambda x S1
+#    new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
+#    
+#    #first_calc= rprop_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
+#    print first_calc    
+#    
+#    kernel.__dict__['pars'][:]=new_hyperparms 
+#    a = kernel.__dict__['pars']
+#    
+#    b=[]    
+#    for ij in range(len(a)):
+#        b.append(a[ij])         
+#    kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
+#    #print 'nova kernel ->',kernel; print''    
+#   
 
-    while it<iterations:
-        nplus=10;nminus=0.1
-        #print 'iteration number:',it+1
+    while it<iterations and d>dmin and d<dmax:
+        #from random import random, randint
+        #nminus=random(); nplus=randint(1,10)        
+        nplus=1.2;nminus=0.5
+        print 'iteration number:',it+1
 
         hyperparms=[] #initial values of the hyperparameters 
         for k in range(len(kernel.__dict__['pars'])):
@@ -115,15 +124,20 @@ def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
         
         #new gradient
         second_calc= rprop_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
-        #print 'old gradient =', first_calc 
-        #print 'new gradient =', second_calc
+        #second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
+        print 'old gradient =', first_calc 
+        print 'new gradient =', second_calc
         update=[]
+        print d
         for i in range(len(first_calc)):
+            #d=step
             if first_calc[i]*second_calc[i]>0:
+                d=nplus*d                
                 update.append(nplus*d)
                 update[i]=-np.sign(first_calc[i])*update [i]
                 #update.insert(nminus*d)
             if first_calc[i]*second_calc[i]<0:
+                d=nminus*d                
                 update.append(nminus*d)
                 update[i]=-np.sign(first_calc[i])*update [i]
                 #update.insert(nminus*d)
@@ -132,7 +146,7 @@ def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
                 update[i]=-np.sign(first_calc[i])*update [i]
             #print i
         #print update
-                
+        print d     
        
         #the new hyperparms will first be -sign(der)*step
         new_hyperparms = update       
@@ -142,6 +156,7 @@ def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
         
         #we're gonna need it when the while starts again (old gradient)            
         first_calc= rprop_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
+        #first_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
         
         kernel.__dict__['pars'][:]=new_hyperparms 
         a = kernel.__dict__['pars']
@@ -150,7 +165,7 @@ def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
         for ij in range(len(a)):
             b.append(a[ij])         
         kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
-        #print 'kernel nova ->',kernel; print''        
+        print 'new kernel ->',kernel; print''        
         
         #for the next step
         #first_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
@@ -163,7 +178,7 @@ def RPROP(kernel,x,xcalc,y,yerr,d=0.005,dmin=0.001,dmax=1,iterations=10):
     
 
 # Conjugate gradient (Fletcher-Reeves) Algorithm - DOES IT WORK? 
-def CGA(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=10):
+def CGA(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=20):
     kernelFIRST=kernel #just not to loose the original one
     xFIRST=x;xcalcFIRST=xcalc #just not to loose the original data
     yFIRST=y;yerrFIRST=yerr #just not to loose the original data
@@ -296,7 +311,7 @@ def CGA(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=10):
                 
 
 # Steepest descent Algorithm - DOES IT WORK? 
-def SDA(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=10):
+def SDA(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=20):
     kernelFIRST=kernel #just not to loose the original one
     xFIRST=x;xcalcFIRST=xcalc #just not to loose the original data
     yFIRST=y;yerrFIRST=yerr #just not to loose the original data
@@ -353,114 +368,114 @@ def SDA(kernel,x,xcalc,y,yerr,step=0.005,precision = 1e-5,iterations=10):
         
         
 #print 'FIRST TEST - CGA'        
-import tests
+#import tests
 #print 'SECOND TEST - SDA'
-import tests2
+#import tests2
 #print 'THIRD TEST - RPROP'
 import tests3
 
 ##### trash - do not delete ###################################################
 
-# Conjugate gradient (Fletcher-Reeves) Algorithm 1st version - DOESN'T WORK 
-def CGA2(kernel,x,xcalc,y,yerr,step=1e-10,precision = 1e-5,iterations=5):
-    kernelFIRST=kernel #just not to loose the original one
-    xFIRST=x;xcalcFIRST=xcalc #just not to loose the original data
-    yFIRST=y;yerrFIRST=yerr #just not to loose the original data
-    it=0
-
-    #First step
-    hyperparms=[] #initial values of the hyperparameters 
-    for k in range(len(kernel.__dict__['pars'])):
-        hyperparms.append(kernel.__dict__['pars'][k])
-    #hyperparms=[np.log(x) for x in hyperparms]
-    hyperparms = hyperparms
-    first_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
-    calc_aux1=[x*step for x in first_calc] #|deltaF1|**2#
-    calc_aux2=sum(calc_aux1)
-    
-    it+=1        
-    while it<=iterations:
-        if it%(len(hyperparms)+1)!=0:        
-            print 'iteration number:',it
-            new_hyperparms = [x*step for x in first_calc]
-            new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
-            kernel.__dict__['pars'][:]=new_hyperparms 
-            a = kernel.__dict__['pars']        
-            b=[]    
-            for ij in range(len(a)):
-                b.append(a[ij])         
-            kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
-            #print 'kernel ->',kernel;print''
-    
-            second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
-            #print 'second -gradient ->', second_calc; print ''
-    
-            calc_aux3=[x**2 for x in second_calc] #|deltaF2|**2#
-            #print   calc_aux3
-            calc_aux4=sum(calc_aux3)
-            #print 'delta_F2 ->', calc_aux4;print''
-        
-            deltas=calc_aux4/calc_aux2 #deltaF1/deltaF2
-            #print deltas
-            
-            hyperparms=[] #initial values of the hyperparameters 
-            for k in range(len(kernel.__dict__['pars'])):
-                hyperparms.append(kernel.__dict__['pars'][k])
-            #hyperparms=[np.log(x) for x in hyperparms]
-            hyperparms = hyperparms
-         
-            new_hyperparms = [x*deltas for x in first_calc]
-            #print 'deltas*S1 ->',new_hyperparms        
-            new_hyperparms = [sum(x) for x in zip(second_calc, new_hyperparms)]
-            #print 'S2+deltas*S1 ->',new_hyperparms
-            
-            kernel.__dict__['pars'][:]=new_hyperparms 
-            a = kernel.__dict__['pars']        
-            b=[]    
-            for ij in range(len(a)):
-                b.append(a[ij])         
-            kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
-            print 'kernel nova ->',kernel; print''
-            it+=1
-            
-            #para o ciclo continuar
-            first_calc=opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
-            calc_aux1=[x**2 for x in first_calc] #|deltaF1|**2#
-            calc_aux2=sum(calc_aux1)
-            #print 'delta_F1 ->', calc_aux2; print''
-        else:
-            print 'iteration number:',it
-            hyperparms=[] #initial values of the hyperparameters 
-            for k in range(len(kernel.__dict__['pars'])):
-                hyperparms.append(kernel.__dict__['pars'][k])
-            #hyperparms=[np.log(x) for x in hyperparms]
-            hyperparms = hyperparms
-
-            second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
-            #print 'second -gradient ->', second_calc; print ''
-        
-            new_hyperparms = [x*step for x in second_calc]
-            new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
-            kernel.__dict__['pars'][:]=new_hyperparms 
-            a = kernel.__dict__['pars']
-            
-            b=[]    
-            for ij in range(len(a)):
-                b.append(a[ij])         
-            kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
-            print 'nova kernel ->',kernel; print''
-            it+=1
-            
-            #para o ciclo continuar
-            first_calc=opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
-            calc_aux1=[x**2 for x in first_calc] #|deltaF1|**2#
-            calc_aux2=sum(calc_aux1)
-            #print 'delta_F1 ->', calc_aux2;print''
-
-    final_log= opt_likelihood(kernel,xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #likelihood    
-    print 'total iterations ->', it-1
-    print 'final log likelihood ->',  final_log
-    print 'final kernel ->', kernel  
+## Conjugate gradient (Fletcher-Reeves) Algorithm 1st version - DOESN'T WORK 
+#def CGA2(kernel,x,xcalc,y,yerr,step=1e-10,precision = 1e-5,iterations=5):
+#    kernelFIRST=kernel #just not to loose the original one
+#    xFIRST=x;xcalcFIRST=xcalc #just not to loose the original data
+#    yFIRST=y;yerrFIRST=yerr #just not to loose the original data
+#    it=0
+#
+#    #First step
+#    hyperparms=[] #initial values of the hyperparameters 
+#    for k in range(len(kernel.__dict__['pars'])):
+#        hyperparms.append(kernel.__dict__['pars'][k])
+#    #hyperparms=[np.log(x) for x in hyperparms]
+#    hyperparms = hyperparms
+#    first_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
+#    calc_aux1=[x*step for x in first_calc] #|deltaF1|**2#
+#    calc_aux2=sum(calc_aux1)
+#    
+#    it+=1        
+#    while it<=iterations:
+#        if it%(len(hyperparms)+1)!=0:        
+#            print 'iteration number:',it
+#            new_hyperparms = [x*step for x in first_calc]
+#            new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
+#            kernel.__dict__['pars'][:]=new_hyperparms 
+#            a = kernel.__dict__['pars']        
+#            b=[]    
+#            for ij in range(len(a)):
+#                b.append(a[ij])         
+#            kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
+#            #print 'kernel ->',kernel;print''
+#    
+#            second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
+#            #print 'second -gradient ->', second_calc; print ''
+#    
+#            calc_aux3=[x**2 for x in second_calc] #|deltaF2|**2#
+#            #print   calc_aux3
+#            calc_aux4=sum(calc_aux3)
+#            #print 'delta_F2 ->', calc_aux4;print''
+#        
+#            deltas=calc_aux4/calc_aux2 #deltaF1/deltaF2
+#            #print deltas
+#            
+#            hyperparms=[] #initial values of the hyperparameters 
+#            for k in range(len(kernel.__dict__['pars'])):
+#                hyperparms.append(kernel.__dict__['pars'][k])
+#            #hyperparms=[np.log(x) for x in hyperparms]
+#            hyperparms = hyperparms
+#         
+#            new_hyperparms = [x*deltas for x in first_calc]
+#            #print 'deltas*S1 ->',new_hyperparms        
+#            new_hyperparms = [sum(x) for x in zip(second_calc, new_hyperparms)]
+#            #print 'S2+deltas*S1 ->',new_hyperparms
+#            
+#            kernel.__dict__['pars'][:]=new_hyperparms 
+#            a = kernel.__dict__['pars']        
+#            b=[]    
+#            for ij in range(len(a)):
+#                b.append(a[ij])         
+#            kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
+#            print 'kernel nova ->',kernel; print''
+#            it+=1
+#            
+#            #para o ciclo continuar
+#            first_calc=opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
+#            calc_aux1=[x**2 for x in first_calc] #|deltaF1|**2#
+#            calc_aux2=sum(calc_aux1)
+#            #print 'delta_F1 ->', calc_aux2; print''
+#        else:
+#            print 'iteration number:',it
+#            hyperparms=[] #initial values of the hyperparameters 
+#            for k in range(len(kernel.__dict__['pars'])):
+#                hyperparms.append(kernel.__dict__['pars'][k])
+#            #hyperparms=[np.log(x) for x in hyperparms]
+#            hyperparms = hyperparms
+#
+#            second_calc= opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #gradient likelihood
+#            #print 'second -gradient ->', second_calc; print ''
+#        
+#            new_hyperparms = [x*step for x in second_calc]
+#            new_hyperparms = [sum(x) for x in zip(hyperparms, new_hyperparms)]
+#            kernel.__dict__['pars'][:]=new_hyperparms 
+#            a = kernel.__dict__['pars']
+#            
+#            b=[]    
+#            for ij in range(len(a)):
+#                b.append(a[ij])         
+#            kernel=new_kernel(kernelFIRST,b) #new kernel with hyperparams updated
+#            print 'nova kernel ->',kernel; print''
+#            it+=1
+#            
+#            #para o ciclo continuar
+#            first_calc=opt_gradlike(kernel, xFIRST,xcalcFIRST,yFIRST,yerrFIRST)
+#            calc_aux1=[x**2 for x in first_calc] #|deltaF1|**2#
+#            calc_aux2=sum(calc_aux1)
+#            #print 'delta_F1 ->', calc_aux2;print''
+#
+#    final_log= opt_likelihood(kernel,xFIRST,xcalcFIRST,yFIRST,yerrFIRST) #likelihood    
+#    print 'total iterations ->', it-1
+#    print 'final log likelihood ->',  final_log
+#    print 'final kernel ->', kernel  
 
        
 #def optimization1(kernel,x,xcalc,y,yerr,step=0.01,precision = 1e-5,iterations=5):
